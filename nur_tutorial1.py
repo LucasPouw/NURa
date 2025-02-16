@@ -9,32 +9,46 @@ def sinc_numpy(x):
     return np.sin(x) / x
 
 
-def prod(array):
-    assert isinstance(array, (list, np.ndarray)), "Input should be np.ndarray or list"
+# def prod(array):
+#     assert isinstance(array, (list, np.ndarray)), "Input should be np.ndarray or list"
 
-    if len(array) == 0:
-        raise ValueError('Trying to take the product of an empty array.')
+#     if len(array) == 0:
+#         raise ValueError('Trying to take the product of an empty array.')
     
-    value = 1
-    for i in array:
-        value *= i
-    return value
+#     value = 1
+#     for i in array:
+#         value *= i
+#     return value
 
 
-def cumprod(array):
-    return np.array([prod(array[:i]) for i in range(1, len(array) + 1)])
+# def cumprod(array):
+#     return np.array([prod(array[:i]) for i in range(1, len(array) + 1)])
+
+
+def cumsum(array):
+    return np.array([np.sum(array[:i]) for i in range(1, len(array) + 1)])
+
+
+def log_factorial(array):
+    assert np.sum(array < 0) == 0, "Input should be greater than or equal than 0."
+
+    array = np.array(array)  # Force list to array
+    max_idx = np.max(array) + 1
+
+    all_factorials = np.zeros(max_idx)
+    all_factorials[1:] = cumsum( np.log(np.arange(1, max_idx)) )  # nth element contains log(n!)
+    return all_factorials[array]
 
 
 def factorial(array):
-    # assert np.all(isinstance(array, int)), "Input should be an integer."
-    # assert np.all(array > -1), "Input should be greater than or equal than 0."
+    assert np.sum(array < 0) == 0, "Input should be greater than or equal than 0."
 
     array = np.array(array)  # Force list to array
+    max_idx = np.max(array) + 1
 
-    all_factorials = cumprod(np.arange(1, np.max(array) + 1))  # nth element contains n!
-    all_factorials = np.insert(all_factorials, 0, 1).astype(int)
-    requested_factorials = all_factorials[array]  # Will error if array contains floats or give wrong value if array contains negative numbers
-    return requested_factorials
+    all_factorials = np.zeros(max_idx)
+    all_factorials[1:] = cumsum( np.log(np.arange(1, max_idx)) )  # nth element contains log(n!)
+    return np.exp(all_factorials[array])
 
 
 def sinc(x, n_max):
@@ -52,12 +66,14 @@ def sinc(x, n_max):
 
 # 3. Interpolation
 
-image = imread('M42_128.jpg')
+# image = imread('M42_128.jpg')
 
 
 if __name__ == '__main__':
 
-    print(factorial(np.array([0, 5, 3])))
+    arr = np.array([200])
+    # print(cumsum(arr))
+    print(factorial(arr))
 
     # x = 7
     # highest_n_max = 100

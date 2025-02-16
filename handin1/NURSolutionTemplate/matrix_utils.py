@@ -1,6 +1,11 @@
 import numpy as np
 
 
+def vandermonde(array):
+    ''' Returns the NxN Vandermonde matrix '''
+    return
+
+
 def crout(matrix):
 
     ''' Returns the LU decomposition of an NxN matrix (2D array)'''
@@ -37,21 +42,13 @@ def check_lu(matrix):
 
 if __name__ == '__main__':
 
-    # matrix = np.array([[1, 2, 3], 
-    #                    [4, 5, 6],
-    #                    [7, 8, 9]])
-
     matrix = np.random.randint(low=-10, high=10, size=(3,3))
-    
-    # matrix = np.array([[7, 8, 9],
-    #                    [1, 2, 3], 
-    #                    [4, 5, 6]])
-    print(matrix, 'ORIGINAL!!!!')
+    print(matrix, 'ORIGINAL')
 
     decomp = crout(matrix)
-    print(decomp, 'DECOMPOSITION!!!!')
+    print(decomp, 'DECOMPOSITION')
 
     check = check_lu(decomp)
-    print(check, 'ORIGINAL????????')
+    print(check, 'RECONSTRUCTED')
 
-    print('work pls', np.allclose(check, matrix))
+    print('\nSAME?', np.allclose(check, matrix))
