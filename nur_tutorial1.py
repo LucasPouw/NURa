@@ -9,22 +9,6 @@ def sinc_numpy(x):
     return np.sin(x) / x
 
 
-# def prod(array):
-#     assert isinstance(array, (list, np.ndarray)), "Input should be np.ndarray or list"
-
-#     if len(array) == 0:
-#         raise ValueError('Trying to take the product of an empty array.')
-    
-#     value = 1
-#     for i in array:
-#         value *= i
-#     return value
-
-
-# def cumprod(array):
-#     return np.array([prod(array[:i]) for i in range(1, len(array) + 1)])
-
-
 def cumsum(array):
     return np.array([np.sum(array[:i]) for i in range(1, len(array) + 1)])
 
@@ -41,14 +25,7 @@ def log_factorial(array):
 
 
 def factorial(array):
-    assert np.sum(array < 0) == 0, "Input should be greater than or equal than 0."
-
-    array = np.array(array)  # Force list to array
-    max_idx = np.max(array) + 1
-
-    all_factorials = np.zeros(max_idx)
-    all_factorials[1:] = cumsum( np.log(np.arange(1, max_idx)) )  # nth element contains log(n!)
-    return np.exp(all_factorials[array])
+    return np.exp(log_factorial(array))
 
 
 def sinc(x, n_max):

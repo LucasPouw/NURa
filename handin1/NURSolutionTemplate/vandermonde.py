@@ -8,8 +8,9 @@ import numpy as np
 import sys
 import os
 import matplotlib.pyplot as plt
-from matrix_utils import vandermonde, solve_matrix_equation
+from matrix import Matrix
 from interpolator import Interpolator
+from utils import polynomial
 
 try:
     data = np.genfromtxt(os.path.join(sys.path[0], "Vandermonde.txt"), comments='#', dtype=np.float64)
@@ -21,12 +22,12 @@ y = data[:, 1]
 xx = np.linspace(x[0], x[-1], 1001)  # x values to interpolate at
 
 # Question 2a
-V = vandermonde(x)
-solution = solve_matrix_equation(V, y, method='LU')
+V = Matrix.as_vandermonde(x)
+V.to_LU()
+solution = V.solve_matrix_equation(y, method='LU')
 print(f'The solution vector is c = {solution}')
-polynomial = lambda x: np.dot(x[:,np.newaxis]**np.arange(len(solution)), solution)
-yya = polynomial(xx)
-ya = polynomial(x)
+yya = polynomial(xx, solution)
+ya = polynomial(x, solution)
 
 # Question 2b
 Interp = Interpolator(data)
@@ -34,10 +35,13 @@ yyb, yyb_error = Interp.polynomial(xx, order=19)
 yb, yb_error = Interp.polynomial(x, order=19)
 
 # Question 2c
-yyc1=yya #replace!
-yc1=ya #replace!
-yyc10=yya #replace!
-yc10=ya #replace!
+improved_solution_1 = V.solve_matrix_equation(y, method='LU', n_iterations=1)
+improved_solution_10 = V.solve_matrix_equation(y, method='LU', n_iterations=10)
+
+yyc1 = polynomial(xx, improved_solution_1)
+yc1 = polynomial(x, improved_solution_1)
+yyc10 = polynomial(xx, improved_solution_10)
+yc10 = polynomial(x, improved_solution_10)
 
 # Plot of points with absolute difference shown on a log scale (question 2a)
 fig = plt.figure()
@@ -48,7 +52,7 @@ plt.xlim(-1, 101)
 # axs[0].set_ylim(np.min(yya), np.max(yya))
 axs[0].set_ylim(-400, 400)
 axs[0].set_ylabel('$y$')
-axs[1].set_ylim(1e-16, 1e1)
+# axs[1].set_ylim(1e-16, 1e1)
 axs[1].set_ylabel('$|y-y_i|$')
 axs[1].set_xlabel('$x$')
 axs[1].set_yscale('log')
@@ -65,17 +69,15 @@ axs[0].legend(frameon=False, loc="lower left")
 axs[1].plot(x, abs(y-yb), linestyle='dashed', color='green')
 plt.savefig('my_vandermonde_sol_2b.png', dpi=600)
 
-print(abs(y-yb), 'AAA')
-
 # #For question 2c, add this block too
-# line,=axs[0].plot(xx,yyc1,linestyle='dotted',color='red')
+# line, = axs[0].plot(xx, yyc1, linestyle='dotted', color='red')
 # line.set_label('LU with 1 iteration')
-# axs[1].plot(x,abs(y-yc1),linestyle='dotted',color='red')
-# line,=axs[0].plot(xx,yyc10,linestyle='dashdot',color='purple')
+# axs[1].plot(x, abs(y-yc1), linestyle='dotted', color='red')
+# line, = axs[0].plot(xx, yyc10, linestyle='dashdot', color='purple')
 # line.set_label('LU with 10 iterations')
-# axs[1].plot(x,abs(y-yc10),linestyle='dashdot',color='purple')
-# axs[0].legend(frameon=False,loc="lower left")
-# plt.savefig('my_vandermonde_sol_2c.png',dpi=600)
+# axs[1].plot(x, abs(y-yc10), linestyle='dashdot', color='purple')
+# axs[0].legend(frameon=False, loc="lower left")
+# plt.savefig('my_vandermonde_sol_2c.png', dpi=600)
 
 #Don't forget to caption your figures to describe them/
 #mention what conclusions you draw from them!
