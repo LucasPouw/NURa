@@ -1,0 +1,3 @@
+Q2a runtime for 10000 iterations = 6.545 s, averaging 6.545e-04 s/it
+Q2b runtime for 100 iterations = 17.807 s, averaging 1.781e-01 s/it
+Q2c runtime for 1000 iterations = 2.755 s, averaging 2.755e-03 s/it
