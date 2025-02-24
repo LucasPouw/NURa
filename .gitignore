@@ -6,11 +6,12 @@ handin1/NURSolutionTemplate/__pycache__/interpolator.cpython-313.pyc
 handin1/NURSolutionTemplate/__pycache__/matrix.cpython-313.pyc
 handin1/NURSolutionTemplate/__pycache__/utils.cpython-313.pyc
 handin1/poisson_output.txt
+handin1/timing_output.txt
+handin1/vandermonde_output.txt
 handin1/pouw.aux
 handin1/pouw.log
 handin1/pouw.pdf
-handin1/timing_output.txt
-handin1/vandermonde_output.txt
+handin1/pouw.out
 handin1/plots/my_vandermonde_sol_2a.png
 handin1/plots/my_vandermonde_sol_2b.png
 handin1/plots/my_vandermonde_sol_2c.png
