@@ -54,7 +54,7 @@ python3 poisson.py > poisson_output.txt
 echo "Running script for exercise 2abc: Vandermonde matrix ..."
 python3 vandermonde.py > vandermonde_output.txt
 
-echo "Running script for timing exercise 2 ..."
+echo "Running script for timing exercise 2, this should take ~20 sec ..."
 python3 timing.py > timing_output.txt
 
 echo "Generating the pdf"

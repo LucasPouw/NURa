@@ -1,5 +1,16 @@
 \section{Matrix class}
 
-All matrix computations and routines are done through the following class in \texttt{matrix.py}:
+All matrix computations and routines are made part of a \texttt{Matrix} class in \texttt{matrix.py}. This class
+takes a 2D \texttt{np.ndarray} as input and keeps track of whether or not the matrix has been overwritten with
+the LU-decomposition indices (through the flag \texttt{is\_LU}) and if any pivoting has been applied in the process
+(through the \texttt{indexing\_array}).
 
+The LU decomposition can be calculated with both the Crout's algorithm and its improved version, but the default is
+the normal Crout's algorithm.
+
+Matrix equations of the form $Ax=b$ can be solved with the matrix class by calling the method \texttt{solve\_matrix\_equation()}.
+This assumes the \texttt{Matrix} object holds the matrix $A$, $b$ must be provided and the output is the solution vector $x$.
+The solution can be iteratively improved if requested.
+
+\noindent The code:
 \lstinputlisting{matrix.py}

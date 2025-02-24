@@ -1,5 +1,20 @@
 \section{Exercise 1: Poisson distribution}
 
+The Poisson distribution requires a division by a factorial. This factorial may overflow itself, or it may cause underflow when
+dividing by it. Therefore, we calculate the factorial and the Poisson distribution in log-space. The logarithm of the factorial
+is calculated with the function \texttt{log\_factorial()}. This function takes an array of integers as input, of which it finds 
+the largest, which we call $k$. The function then calculates $\ln(1) + \ln(2) + ... + \ln(k - 1) + \ln(k)$ and stores the cumulative
+sum in an array, such that the $n$th element of that array contains $\ln(n!)$. As such, the requested factorials in the input array
+of integers can then be returned by indexing the cumulative array. This ensures that the minimum number of computations is done, given
+an input array. However, the cumulative array does require more memory than strictly necessary.
+
+The Poisson distribution is then calculated in log-space, while making sure that each computation returns a 32-bit float. Finally, the
+answer is exponentiated to give the desired result.
+
+\noindent The code:
+
 \lstinputlisting{poisson.py}
+
+\noindent The output:
 
 \input{poisson_output.txt}

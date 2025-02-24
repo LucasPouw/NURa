@@ -20,13 +20,18 @@ class Matrix:
     
     @classmethod
     def as_vandermonde(cls, array):
+        ''' Initialize Matrix object using a 1D array from which the Vandermonde matrix is calculated. '''
         matrix = np.array(array).astype(np.float64)
         return cls(cls._vandermonde(matrix))
 
 
     @classmethod
     def as_LU(cls, array, improved=False):
-        ''' Set improved=True to use the improved Crout's algorithm '''
+        ''' 
+        Initialize Matrix object and immediately calculate its LU-decomposition.
+
+        Set improved=True to use the improved Crout's algorithm
+        '''
         matrix = array.astype(np.float64)  # Assuming you do not want to overwrite the input array when initializing the class
         if improved:
             indexing_array = cls._to_LU_improved_crout(matrix)
@@ -45,7 +50,7 @@ class Matrix:
 
 
     def undo_LU(self):
-        if self.is_LU:
+        if self.is_LU:  # Can only undo LU if it is LU
             P, L, U = self.get_LU()
             
             self.matrix = P.T @ L @ U
@@ -56,12 +61,12 @@ class Matrix:
     def get_LU(self):
         self._check_LU()  # Can only return LU if matrix is LU decomposition
 
-        upper, lower = np.triu(self.matrix), np.tril(self.matrix)
+        L, U = np.tril(self.matrix), np.triu(self.matrix)
         n = self.matrix.shape[0]
-        lower[range(n), range(n)] = 1
+        L[range(n), range(n)] = 1  # Set diagonal of lower matrix to 1
 
-        permute = self._get_permutation_matrix()
-        return permute, lower, upper
+        P = self._get_permutation_matrix()
+        return P, L, U
     
 
     def solve_matrix_equation(self, b, method='LU', n_iterations=0):
@@ -75,11 +80,13 @@ class Matrix:
                 self._check_LU()
 
                 solution = self._solve_equation_LU(b)
-                P, L, U = self.get_LU()
-                A = P.T @ L @ U
-                for _ in range(n_iterations):  # Improve solution
-                    db = A @ solution - b
-                    solution -= self._solve_equation_LU(db)
+
+                if n_iterations != 0:  # Iteratively improve solution
+                    P, L, U = self.get_LU()
+                    A = P.T @ L @ U  # Need original matrix
+                    for _ in range(n_iterations):
+                        db = A @ solution - b
+                        solution -= self._solve_equation_LU(db)
             
             case _:
                 sys.exit('Method not implemented.')

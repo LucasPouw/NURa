@@ -3,7 +3,13 @@ from utils import cumsum
 
 
 def log_factorial(array):
-    assert np.sum(array < 0) == 0, "Input should be greater than or equal than 0."
+    '''
+    Calculates the logarithm of the factorial of the input array element-wise.
+
+    Input: np.ndarray or list of integers
+    Output: np.ndarray of factorials of 
+    '''
+    assert np.sum(array < 0) == 0, "All elements should be greater than or equal to 0."
 
     array = np.array(array).astype(np.int32)  # Force list to array of integers
     max_idx = np.max(array) + 1
