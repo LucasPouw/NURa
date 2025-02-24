@@ -26,4 +26,4 @@ if __name__ == '__main__':
     ks = np.array([0, 10, 21, 40, 5, 200])
     results = poisson(lambdas, ks)
     for i, result in enumerate(results):
-        print(f'$(\\lambda, k)$ = ({lambdas[i]}, {ks[i]}) -> $P_{{\\lambda}}(k)$ = {results[i]:.6e}')
+        print(f'$(\\lambda, k)$ = ({lambdas[i]}, {ks[i]}) gives $P_{{\\lambda}}(k)$ = {results[i]:.6e}\n')

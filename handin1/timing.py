@@ -41,7 +41,7 @@ yc10 = polynomial(x, improved_solution_10)
 def main(n_its=[10000, 100, 1000]):
     for i, (q, code) in enumerate(zip(['Q2a', 'Q2b', 'Q2c'], [q2a_code2time, q2b_code2time, q2c_code2time])):
         time = timeit.timeit(setup=setup, stmt=code, number=n_its[i])
-        print(f"{q} runtime for {n_its[i]} iterations = {time:.3f} s, averaging {time/n_its[i]:.3e} s/it")
+        print(f"{q} runtime for {n_its[i]} iterations = {time:.3f} s, averaging {time/n_its[i]:.3e} s/it \n")
 
 
 if __name__ == "__main__":

@@ -17,7 +17,10 @@ xx = np.linspace(x[0], x[-1], 1001)  # x values to interpolate at
 V = Matrix.as_vandermonde(x)
 V.to_LU(improved=False)
 solution = V.solve_matrix_equation(y, method='LU')
-print(f'The solution vector is c = {solution}')
+print('The solution vector is c = [\n')
+for coef in solution:
+    print(coef, '\n')
+print(']')
 yya = polynomial(xx, solution)
 ya = polynomial(x, solution)
 
