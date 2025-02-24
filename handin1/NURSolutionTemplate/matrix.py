@@ -93,7 +93,7 @@ class Matrix:
 
         # Forward substitution
         solution = b.copy()  # Assuming alpha[i,i] = 1 in our Crout implementation
-        self._permute_array(solution)  # Correct for pivoting - output solution will be unpivoted
+        self._undo_pivoting(solution)  # Correct for pivoting - output solution will be unpivoted
 
         for i in range(sol_len):
             for j in range(i):
@@ -118,8 +118,7 @@ class Matrix:
             self.to_LU()
 
     
-    def _permute_array(self, array):
-        # Correct for pivoting, I know this is inefficient, but I'm tired. TODO
+    def _undo_pivoting(self, array):
         for k, imax in enumerate(self.indexing_array):
             if k != imax:
                 array[k], array[imax] = array[imax], array[k]
