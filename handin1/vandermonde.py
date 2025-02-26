@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matrix import Matrix
 from interpolator import Interpolator
 from utils import polynomial
+from numpy.linalg import cond  # This is only to illustrate an argument!
 
 
 data = np.genfromtxt(os.path.join(sys.path[0], "Vandermonde.txt"), comments='#', dtype=np.float64)
@@ -15,6 +16,7 @@ xx = np.linspace(x[0], x[-1], 1001)  # x values to interpolate at
 
 # Question 2a
 V = Matrix.as_vandermonde(x)
+print(f'The condition number of the Vandermonde matrix is {cond(V.matrix):.3e}.\n')
 V.to_LU(improved=False)
 solution = V.solve_matrix_equation(y, method='LU')
 print('The solution vector is c = [\n')
