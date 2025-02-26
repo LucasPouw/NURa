@@ -73,23 +73,21 @@ class Matrix:
 
         assert len(b) == self.matrix.shape[0], f'Vector b shape {b.shape} must match matrix A shape {self.matrix.shape} in Ax=b'
 
-        match method:
+        if method == 'LU':
 
-            case 'LU':
+            self._check_LU()
 
-                self._check_LU()
+            solution = self._solve_equation_LU(b)
 
-                solution = self._solve_equation_LU(b)
-
-                if n_iterations != 0:  # Iteratively improve solution
-                    P, L, U = self.get_LU()
-                    A = P.T @ L @ U  # Need original matrix
-                    for _ in range(n_iterations):
-                        db = A @ solution - b
-                        solution -= self._solve_equation_LU(db)
-            
-            case _:
-                sys.exit('Method not implemented.')
+            if n_iterations != 0:  # Iteratively improve solution
+                P, L, U = self.get_LU()
+                A = P.T @ L @ U  # Need original matrix
+                for _ in range(n_iterations):
+                    db = A @ solution - b
+                    solution -= self._solve_equation_LU(db)
+        
+        else:
+            sys.exit('Method not implemented.')
 
         return solution
     
