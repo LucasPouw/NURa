@@ -54,7 +54,7 @@ def rng(size,
     return result
 
 
-def uniform(low=0, high=1, size=1, **kwargs):
+def uniform(low=0., high=1., size=1, **kwargs):
     '''Generates uniformly distributed pseudo-random 64-bit floats in the interval (low, high)'''
     assert low < high, 'Lower bound must be smaller than upper bound.'  # Not strictly necessary, but just makes sense
     result = rng(size, **kwargs) / RNGMAX * (high - low) + low

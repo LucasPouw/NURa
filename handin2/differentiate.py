@@ -14,7 +14,7 @@ def ridder(func, x, h=0.1, d=float(2), m=5, target_error=1e-3):
     for i in range(1, m):
         trial_df = df.copy()
 
-        print(lowest_error)
+        print('Checking lowest error:', lowest_error)
 
         d = d**(2 * i)
         for j in range(m - i):
@@ -43,7 +43,8 @@ if __name__ == '__main__':
     df = lambda x: 2 * x * np.sin(x) + x**2 * np.cos(x)
 
     xx = np.linspace(0, 2*np.pi, 200)
-    print(ridder(func, xx))
+    # print(ridder(func, xx))
+
     # plt.figure()
     # plt.plot(xx, df(xx))
     # colors=['red', 'blue', 'black']
@@ -52,10 +53,9 @@ if __name__ == '__main__':
     # plt.plot(xx, ridder(func, xx)[0], linewidth=5, zorder=-1, color='magenta')
     # plt.show()
 
-    # plt.figure()
-    # colors=['red', 'blue', 'black']
-    # for i, h in enumerate([0.1, 0.01, 0.001]):
-    #     plt.plot(xx, abs(df(xx) - central_difference(func, xx, h)), color=colors[i])
-    # plt.plot(xx, abs(df(xx) - ridder(func, xx)[0]), linewidth=5, zorder=-1, color='magenta')
-    # plt.semilogy()
-    # plt.show()
+    plt.figure()
+    colors=['red', 'blue', 'black']
+    for i, h in enumerate([0.1, 0.01, 0.001]):
+        plt.scatter(xx, np.log10( abs(df(xx) - central_difference(func, xx, h)) ) - np.log10(abs(df(xx))), color=colors[i], marker='.')
+    plt.scatter(xx, np.log10( abs(df(xx) - ridder(func, xx)[0]) ) - np.log10(abs(df(xx))), zorder=-1, color='magenta', marker='.')
+    plt.show()
