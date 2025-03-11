@@ -3,14 +3,14 @@ import time
 
 
 TWOTOPOWER32 = np.uint64(1) << np.uint64(32)
-RNGMAX = 1 << 64
+TWOTOPOWER64 = 2**64
 
 
 def current_milli_time():
     return np.uint64(time.time() * 1000)
 
 
-def xorshift(seed, a1=np.uint64(21), a2=np.uint64(35), a3=np.uint64(4)):
+def xorshift64(seed, a1, a2, a3):
     '''64-bit XOR-shift method'''
     x = np.uint64(seed)
     assert x != np.uint64(0), 'Seed must be non-zero.'
@@ -22,56 +22,48 @@ def xorshift(seed, a1=np.uint64(21), a2=np.uint64(35), a3=np.uint64(4)):
     x = x ^ (x >> a1)
     x = x ^ (x << a2)
     x = x ^ (x >> a3)
-    return x
+    return np.uint64(x) 
 
 
-def mwc(seed, a=np.uint64(4294957665)):
-    '''64-bit Multiply with Carry method'''
-    x = np.uint64(np.uint64(seed) & np.uint64(TWOTOPOWER32 - np.uint64(1)))  # Ensure seed < 2**32
+def mwc32(seed, a):
+    '''32-bit Multiply with Carry method'''
+    x = np.uint64( np.uint64(seed) & np.uint64(TWOTOPOWER32 - np.uint64(1)) )  # Ensure initial state < 2**32
     a = np.uint64(a)
     assert x != np.uint64(0), 'Seed must be non-zero.'
-    
     x = a * (x & (TWOTOPOWER32 - np.uint64(1))) + (x >> np.uint64(32))
-    return x & (TWOTOPOWER32 - np.uint64(1))
+    return np.uint32( x & (TWOTOPOWER32 - np.uint64(1)) )  # Only provide lowest 32 bits
 
 
-def rng(size, 
+def rng32(size, 
         seed=current_milli_time(), 
-        mwcparam=np.uint64(4294957665), 
-        xorshiftparam=[np.uint64(21), np.uint64(35), np.uint64(4)]):
-    '''Generates uniformly distributed pseudo-random unsigned 64-bit integers in the interval [0, 2**64).'''
-
-    a1, a2, a3 = xorshiftparam
+        mwcparam=3238579223, 
+        xorshiftparam=[17, 37, 3]):  # Primes
+    '''Generates uniformly distributed pseudo-random unsigned 32-bit integers in the interval [0, 2**32).'''
     
-    result = np.zeros(size, dtype=np.uint64)
+    result = np.zeros(size, dtype=np.uint32)
+    mwc_state = seed.copy()
+    xor_state = seed.copy()
     for i in range(size):
-        x1 = mwc(seed, mwcparam)
-        x2 = xorshift(x1, a1, a2, a3)
-        
-        result[i] = x2
-        seed = x2.copy()  # Use current number to generate next number
+        xor_state = xorshift64(xor_state, *xorshiftparam)
+        mwc_state = mwc32(mwc_state, mwcparam)
 
+        value = np.uint32(xor_state ^ mwc_state)
+        
+        result[i] = value
     return result
 
 
 def uniform(low=0., high=1., size=1, **kwargs):
-    '''Generates uniformly distributed pseudo-random 64-bit floats in the interval (low, high)'''
+    '''Generates uniformly distributed pseudo-random 32-bit floats in the interval (low, high)'''
     assert low < high, 'Lower bound must be smaller than upper bound.'  # Not strictly necessary, but just makes sense
-    result = rng(size, **kwargs) / RNGMAX * (high - low) + low
-    return result.astype(np.float64)
+    result = rng32(size, **kwargs) / TWOTOPOWER32 * (high - low) + low
+    return np.float64(result)
 
 
 def randint(low, high, size, **kwargs):
-    '''Generates uniformly distributed pseudo-random signed 32-bit ints in the interval [low, high]'''
-    low, high = np.int32(low), np.int32(high)
-    assert low < high, 'Lower bound must be smaller than upper bound.'
-    full_range_values = rng(size, **kwargs)
-
-    # requested_range_values=np.zeros(size)
-    # for i in range(size):
-    #     requested_range_values[i] = (full_range_values[i] >> np.uint64(64)) * (high - low + 1) + low
-    requested_range_values = full_range_values / RNGMAX * (high - low + 1) + low
-    return requested_range_values.astype(np.int32)
+    '''Generates uniformly distributed pseudo-random signed 32-bit ints in the interval [low, high)'''
+    requested_range_values = uniform(low, high, size, **kwargs)
+    return np.floor(requested_range_values).astype(np.int32)
 
 
 # def choice(array: np.ndarray, size=1, replace=False, **kwargs):
@@ -112,18 +104,19 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     N = 1000
-    size = 1000000
+    size = 100000
 
     # arr = choice(np.arange(N), size=size)
     # print(arr, 'result')
-    
-    rng_arr = randint(-10, 50, size)
-    
-    # rng_arr = uniform(size=size, low=-10, high=50)
 
-    # maxnum = 1
+    minval = 0
+    maxval = 100
+    
+    rng_arr = randint(minval, maxval, size)
+    edges = np.linspace(minval, maxval, int(maxval - minval + 1))
+    # print(np.min(rng_arr), np.max(rng_arr))
     plt.figure()
-    plt.hist(rng_arr, bins=50, density=True)
+    plt.hist(rng_arr, bins=edges, density=True)
     # plt.vlines(maxnum, 0, 1/maxnum, color='red')
     plt.show()
 
