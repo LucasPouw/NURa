@@ -1,3 +1,6 @@
+#%%
+%%time
+
 import numpy as np
 from tqdm import tqdm
 
@@ -20,57 +23,94 @@ def selection_sort(array: np.ndarray) -> None:
 
 
 def quicksort(array: np.ndarray) -> None:
-    ''' In-place sorting with quicksort algortihm. '''
+    ''' In-place sorting with quicksort algortihm that is not so quick... '''
 
     array = np.asarray(array)
-    print(array)
-
     N = len(array)
-    pivot = np.median([array[0], array[N//2], array[-1]]).astype(array.dtype)
 
+    # Sorting first, middle and last element
+    pivot = np.median([array[0], array[N//2], array[-1]]).astype(array.dtype)
     pivot_idx = np.where(array == pivot)[0][0]
     array[N//2], array[pivot_idx] = array[pivot_idx], array[N//2]
-    print('Pivot in middle', array)
+    if array[0] > array[-1]:
+        array[-1], array[0] = array[0], array[-1]
 
+    if len(array) <= 3:  # Sub-array of size 3 is now sorted
+        return
+
+    j = N - 1
+    i = 0
     i_flag, j_flag = False, False
-    for i, j in zip(range(N), range(N)[::-1]):
-        print(i, j)
-        if j <= i:
-            print('j <= i', array)
-            break
+    while j > i:
 
-        if array[i] >= pivot:
-            switch_i = i
-            i_flag = True
+        if not i_flag:
+            if array[i] >= pivot:
+                i_flag = True
+            else:
+                i += 1
 
-        if array[j] <= pivot:
-            switch_j = j
-            j_flag = True
+        if not j_flag:
+            if array[j] <= pivot:
+                j_flag = True
+            else:
+                j -= 1
         
-        if i_flag * j_flag:
-            array[switch_i], array[switch_j] = array[switch_j], array[switch_i]
-            print('Switch made:', array)
-    
-    if len(array[:N//2]) > 1:
-        print('Doing left subarray')
-        quicksort(array[:N//2])
+        if i_flag & j_flag:
+            array[i], array[j] = array[j], array[i]
+            i_flag, j_flag = False, False
 
-    if len(array[N//2:]) > 1:
-        print('Doing right subarray')
-        quicksort(array[N//2:])
+    # Sorting sub-arrays
+    pivot_idx = np.where(array == pivot)[0][0]  # Pivot could have change position
+    quicksort(array[:pivot_idx])
+    quicksort(array[pivot_idx:])
+
+
+def quicksort_gpt(arr, low=0, high=None):
+    if high is None:
+        high = len(arr) - 1
+    
+    if low < high:
+        pivot_index = partition(arr, low, high)
+        quicksort_gpt(arr, low, pivot_index - 1)
+        quicksort_gpt(arr, pivot_index + 1, high)
+    
+    return arr
+
+def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+    
+    for j in range(low, high):
+        if arr[j] < pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
 
     
 if __name__ == '__main__':
 
-    N = int(7)
+    N = int(1e3)
     array = np.arange(N)
     np.random.shuffle(array)
 
-    # array = np.array([60, 24, 7, 1890, 55, 105982340, 0])
-    
+    unsorted_mine = array.copy()
+    unsorted_gpt = array.copy()
+
     is_sorted = lambda a: np.all(a[:-1] <= a[1:])
-    print(is_sorted(array), array)
+    print('Initial array sorted?', is_sorted(array))
 
     # selection_sort(array)
-    quicksort(array)
-    print(is_sorted(array), array)
+
+#%%
+    %%time
+    quicksort(unsorted_mine)
+    print('Final array sorted?', is_sorted(unsorted_mine))
+
+#%%
+    %%time
+    quicksort_gpt(unsorted_gpt)
+    print('Final array sorted?', is_sorted(unsorted_gpt))
+
+#%%
