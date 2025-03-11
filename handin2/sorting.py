@@ -1,6 +1,3 @@
-#%%
-%%time
-
 import numpy as np
 from tqdm import tqdm
 
@@ -23,17 +20,25 @@ def selection_sort(array: np.ndarray) -> None:
 
 
 def quicksort(array: np.ndarray) -> None:
-    ''' In-place sorting with quicksort algortihm that is not so quick... '''
+    ''' In-place sorting with quicksort algortihm '''
 
     array = np.asarray(array)
     N = len(array)
 
+    if N == 0:
+        return
+
+    mid = N//2
+
     # Sorting first, middle and last element
-    pivot = np.median([array[0], array[N//2], array[-1]]).astype(array.dtype)
-    pivot_idx = np.where(array == pivot)[0][0]
-    array[N//2], array[pivot_idx] = array[pivot_idx], array[N//2]
-    if array[0] > array[-1]:
-        array[-1], array[0] = array[0], array[-1]
+    if array[0] > array[mid]:
+        array[0], array[mid] = array[mid], array[0]
+    if array[mid] > array[-1]:
+        array[mid], array[-1] = array[-1], array[mid]
+    if array[0] > array[mid]:
+        array[0], array[mid] = array[mid], array[0]
+
+    pivot = array[mid]
 
     if len(array) <= 3:  # Sub-array of size 3 is now sorted
         return
@@ -55,43 +60,18 @@ def quicksort(array: np.ndarray) -> None:
             else:
                 j -= 1
         
-        if i_flag & j_flag:
+        if i_flag and j_flag:
             array[i], array[j] = array[j], array[i]
             i_flag, j_flag = False, False
 
-    # Sorting sub-arrays
-    pivot_idx = np.where(array == pivot)[0][0]  # Pivot could have change position
-    quicksort(array[:pivot_idx])
-    quicksort(array[pivot_idx:])
-
-
-def quicksort_gpt(arr, low=0, high=None):
-    if high is None:
-        high = len(arr) - 1
-    
-    if low < high:
-        pivot_index = partition(arr, low, high)
-        quicksort_gpt(arr, low, pivot_index - 1)
-        quicksort_gpt(arr, pivot_index + 1, high)
-    
-    return arr
-
-def partition(arr, low, high):
-    pivot = arr[high]
-    i = low - 1
-    
-    for j in range(low, high):
-        if arr[j] < pivot:
-            i += 1
-            arr[i], arr[j] = arr[j], arr[i]
-    
-    arr[i + 1], arr[high] = arr[high], arr[i + 1]
-    return i + 1
+    # Sorting sub-arrays. In between i and j are repeats of the pivot, so don't include these.
+    quicksort(array[:i])
+    quicksort(array[j+1:])
 
     
 if __name__ == '__main__':
 
-    N = int(1e3)
+    N = int(1e6)
     array = np.arange(N)
     np.random.shuffle(array)
 
@@ -103,14 +83,5 @@ if __name__ == '__main__':
 
     # selection_sort(array)
 
-#%%
-    %%time
     quicksort(unsorted_mine)
     print('Final array sorted?', is_sorted(unsorted_mine))
-
-#%%
-    %%time
-    quicksort_gpt(unsorted_gpt)
-    print('Final array sorted?', is_sorted(unsorted_gpt))
-
-#%%
