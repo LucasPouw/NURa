@@ -4,6 +4,7 @@ handin1/*.txt
 handin1/pouw.aux
 handin1/pouw.log
 handin1/pouw.pdf
+handin1/pouw.out
 
 handin2/__pycache__
 handin2/plots
@@ -11,6 +12,7 @@ handin2/*.txt
 handin2/pouw.aux
 handin2/pouw.log
 handin2/pouw.pdf
+handin2/pouw.out
 
 handin3/__pycache__
 handin3/plots
@@ -18,3 +20,4 @@ handin3/*.txt
 handin3/pouw.aux
 handin3/pouw.log
 handin3/pouw.pdf
+handin3/pouw.out
