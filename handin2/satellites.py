@@ -2,8 +2,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from integrate import romberg
-from rng import uniform
-import sys
+# from rng import uniform
+import sys, os
+
+uniform = np.random.uniform   # TODO: CHANGE TO MY OWN
 
 NSAT = 100
 A = 2.4
@@ -22,7 +24,7 @@ def numdens(x, norm, Nsat=NSAT, a=A, b=B, c=C):
 
 # Q1a
 func2integrate = lambda x: numdens(x, Nsat=1, norm=1) * x**2 * 4 * np.pi  # Nsat = 1 such that norm = 1/integral
-integral = romberg(func2integrate, XMIN, XMAX, order=12)  # Wolfram: 0.108756
+integral = romberg(func2integrate, XMIN, XMAX, order=14)  # Wolfram: 0.108756
 normalization = 1/integral[0]
 print(integral, 'integral of p(x) for norm=1')
 print(normalization, 'required normalization on x=[0, 5]')
@@ -55,9 +57,13 @@ def inverse_cdf(x, norm=normalization, a=A, b=B, c=C):
     return result
 
 
+def pmax(norm=normalization, a=A, b=B, c=C):
+    return 4 * np.pi * norm * b**2 * ((a-1)/c)**((a-1)/c) * np.exp((1-a)/c)
+
+
 #################### Rejection sampling ####################
 accepted_samps = np.zeros(N_GENERATE)
-samps_per_it = int(1e3)  # Chunking speeds things up a lot
+samps_per_it = int(1e3)  # Chunking speeds things up
 n_accepted = 0
 it_counter = 0
 max_it = int(1e5)
@@ -69,15 +75,19 @@ while n_accepted < N_GENERATE:
         break
 
     # First sample from f(x) using inverse transform sampling
-    unif1 = np.random.uniform(low=0, high=max_value_cdf, size=samps_per_it)
-    fx_samp = inverse_cdf(unif1)
+    unif1 = inverse_cdf( uniform(low=0, high=max_value_cdf, size=samps_per_it) )
+    # for x in unif1:
+    #     print('high', func2samp(x))
+    #     print(x, p_of_x(x))
+    # print(np.max(func2samp(fx_samp)), unif1[np.argmax(func2samp(fx_samp))], 'AA')
 
     # Then rejection-sample p(x)
-    unif2 = np.random.uniform(low=0, high=func2samp(fx_samp), size=samps_per_it)
+    # unif1 = uniform(low=XMIN, high=XMAX, size=samps_per_it)
+    # unif2 = uniform(low=0, high=pmax(), size=samps_per_it)
+    unif2 = uniform(low=0, high=func2samp(unif1), size=samps_per_it)
     accept_these = np.where(unif2 < p_of_x(unif1))[0]
-    n_newly_accepted = len(accept_these)
-    trial_n_total = n_accepted + n_newly_accepted
-    
+
+    trial_n_total = n_accepted + len(accept_these)
     if trial_n_total > N_GENERATE:  # We have more samples than needed in the final iteration
         print(f'Found {trial_n_total - N_GENERATE} too many valid samples, removing them.')
         accept_these = accept_these[:N_GENERATE - n_accepted]  # Don't include the samples that were not requested
@@ -91,47 +101,50 @@ while n_accepted < N_GENERATE:
 print(f'Accepted:{n_accepted}/{N_GENERATE} in {it_counter} iterations.')
 ############################################################
 
-fx_samps = inverse_cdf(np.random.uniform(low=0, high=max_value_cdf, size=N_GENERATE))
+x_samps = inverse_cdf( uniform(low=0, high=max_value_cdf, size=N_GENERATE ) )
 
 plt.figure()
 plt.plot(xx, cdf(xx), color='black', label=r'CDF')
 plt.plot(xx, inverse_cdf(xx), color='grey', label=r'ICDF')
 plt.plot(xx, func2samp(xx), color='red', zorder=6, label=r'$f(x)$')
 plt.plot(xx, p_of_x(xx), color='blue', zorder=5, label=r'$p(x)$')
-plt.hist(accepted_samps, density=True, histtype='step', color='skyblue', linewidth=2, bins=50, label='Rejection sampled')
-hist, edges = np.histogram(fx_samps, bins=100, density=True)
+
+edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 51)
+hist, _ = np.histogram(x_samps, bins=edges, density=True)
 plt.stairs(hist * max_value_cdf, edges=edges, linewidth=2, color='coral', label='Inverse transform sampled')
-plt.ylim(XMIN, XMAX)
+plt.hist(accepted_samps, density=True, histtype='step', color='skyblue', linewidth=2, bins=edges, label='Rejection sampled')
+plt.ylim(10 ** (-3), 5)
 plt.xlim(XMIN, XMAX)
+plt.loglog()
 # plt.semilogy()
 plt.legend()
-plt.show()
+plt.savefig(os.path.join(sys.path[0], "plots/testing1blogax_manysamp.png"), dpi=600)
 
-# # 21 edges of 20 bins in log-space
-# edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 21)
-# hist = np.histogram(XMIN + np.sort(np.random.rand(N_GENERATE)) * (XMAX - XMIN), bins=edges)[0]  # replace!
-# hist_scaled = (1e-3 * hist)  # replace; this is NOT what you should be plotting, this is just a random example to get a plot with reasonable y values (think about how you *should* scale hist)
+# 21 edges of 20 bins in log-space
+edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 21)
+hist = np.histogram(accepted_samps, bins=edges)[0]
+hist_scaled = hist / np.diff(edges) / (N_GENERATE / NSAT ) / NSAT   # TODO: figure out why the two factors of 100 are necessary to normalize the histogram -> I probably forgot an <Nsat> somewhere
 
-# relative_radius = edges.copy()  # replace!
-# analytical_function = edges.copy()  # replace
+relative_radius = xx
+analytical_function = p_of_x(xx)
 
-# fig1b, ax = plt.subplots()
-# ax.stairs(
-#     hist_scaled, edges=edges, fill=True, label="Satellite galaxies"
-# )  # just an example line, correct this!
-# plt.plot(
-#     relative_radius, analytical_function, "r-", label="Analytical solution"
-# )  # correct this according to the exercise!
-# ax.set(
-#     xlim=(XMIN, XMAX),
-#     ylim=(10 ** (-3), 10),
-#     yscale="log",
-#     xscale="log",
-#     xlabel="Relative radius",
-#     ylabel="Number of galaxies",
-# )
-# ax.legend()
-# plt.savefig("figures/my_solution_1b.png", dpi=600)
+fig1b, ax = plt.subplots()
+ax.stairs(
+    hist_scaled, edges=edges, fill=True, label="Satellite galaxies"
+)  # just an example line, correct this!
+plt.plot(
+    relative_radius, analytical_function, "r-", label="Analytical solution"
+)  # correct this according to the exercise!
+ax.set(
+    xlim=(XMIN, XMAX),
+    ylim=(10 ** (-3), 10),
+    yscale="log",
+    xscale="log",
+    xlabel="Relative radius",
+    ylabel="Number of galaxies",
+)
+ax.legend()
+plt.savefig(os.path.join(sys.path[0], "plots/my_solution_1b.png"), dpi=600)
 
 # # Cumulative plot of the chosen galaxies (1c)
 # chosen = XMIN + np.sort(np.random.rand(NSAT)) * (XMAX - XMIN)  # replace!

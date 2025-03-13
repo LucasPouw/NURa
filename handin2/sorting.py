@@ -47,7 +47,6 @@ def quicksort(array: np.ndarray) -> None:
     i = 0
     i_flag, j_flag = False, False
     while j > i:
-
         if not i_flag:
             if array[i] >= pivot:
                 i_flag = True
@@ -61,27 +60,31 @@ def quicksort(array: np.ndarray) -> None:
                 j -= 1
         
         if i_flag and j_flag:
-            array[i], array[j] = array[j], array[i]
+            if array[i] != array[j]:  # Only swap if they are not equal to get stable algorithm
+                array[i], array[j] = array[j], array[i]
+            else:  # Avoid infinite loops that happen when array[i] = array[j]
+                i += 1
+
             i_flag, j_flag = False, False
 
-    # Sorting sub-arrays. In between i and j are repeats of the pivot, so don't include these.
+    # Sorting sub-arrays
     quicksort(array[:i])
-    quicksort(array[j+1:])
+    quicksort(array[j+1:])  # Don't include pivot
 
     
 if __name__ == '__main__':
 
     N = int(1e6)
     array = np.arange(N)
+    # array[:100] = N//2
     np.random.shuffle(array)
-
-    unsorted_mine = array.copy()
-    unsorted_gpt = array.copy()
+    print(array)
 
     is_sorted = lambda a: np.all(a[:-1] <= a[1:])
     print('Initial array sorted?', is_sorted(array))
 
     # selection_sort(array)
 
-    quicksort(unsorted_mine)
-    print('Final array sorted?', is_sorted(unsorted_mine))
+    quicksort(array)
+    print(array)
+    print('Final array sorted?', is_sorted(array))
