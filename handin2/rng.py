@@ -22,7 +22,7 @@ def xorshift64(seed, a1, a2, a3):
     x = x ^ (x >> a1)
     x = x ^ (x << a2)
     x = x ^ (x >> a3)
-    return np.uint64(x) 
+    return np.uint64(x)
 
 
 def mwc32(seed, a):
@@ -56,66 +56,37 @@ def rng32(size,
 def uniform(low=0., high=1., size=1, **kwargs):
     '''Generates uniformly distributed pseudo-random 32-bit floats in the interval (low, high)'''
     result = rng32(size, **kwargs) / TWOTOPOWER32 * (high - low) + low
-    return np.float64(result)
+    return result.astype(np.float32)
 
 
-def randint(low, high, size, **kwargs):
+def randint(low, high, size=1, **kwargs):
     '''Generates uniformly distributed pseudo-random signed 32-bit ints in the interval [low, high)'''
     requested_range_values = uniform(low, high, size, **kwargs)
     return np.floor(requested_range_values).astype(np.int32)
 
 
-# def choice(array: np.ndarray, size=1, replace=False, **kwargs):
-#     '''Sample elements from array with equal probability'''
-
-#     array = np.asarray(array)
-#     N = len(array)
-
-#     if not replace:
-#         assert size <= N, 'Cannot draw more samples than elements in array without replacement.'
-
-#         random_indeces = np.zeros(size, dtype=np.int32)
-
-#         # Is this still uniform or am I doing the Monty Hall problem?
-#         allowed_indeces = np.arange(N)
-#         for i in range(size):
-
-#             if i == N-1:  # Only one element left to choose from
-#                 random_indeces[i] = allowed_indeces[0]
-#                 continue
-
-#             idx = np.int32( np.rint(uniform(low=0, high=N-1-i, size=1, **kwargs)) )
-#             random_indeces[i] = allowed_indeces[idx]
-#             allowed_indeces = np.delete(allowed_indeces, idx)
-#     else:
-#         random_floats = uniform(low=0, high=N-1, size=size, **kwargs)
-#         random_indeces = np.int32( np.rint(random_floats) )
-
-#     return array[random_indeces]
-
-
-# def uniform_on_sphere():
-#     return
-
-
 if __name__ == '__main__':
 
-    import matplotlib.pyplot as plt
+    seed = current_milli_time()
+    for i in range(10):
+        print(uniform(seed=seed+i))
 
-    N = 1000
-    size = 100000
+    # import matplotlib.pyplot as plt
 
-    # arr = choice(np.arange(N), size=size)
-    # print(arr, 'result')
+    # N = 1000
+    # size = 100000
 
-    minval = 0
-    maxval = 100
+    # # arr = choice(np.arange(N), size=size)
+    # # print(arr, 'result')
+
+    # minval = 0
+    # maxval = 100
     
-    rng_arr = randint(minval, maxval, size)
-    edges = np.linspace(minval, maxval, int(maxval - minval + 1))
-    # print(np.min(rng_arr), np.max(rng_arr))
-    plt.figure()
-    plt.hist(rng_arr, bins=edges, density=True)
-    # plt.vlines(maxnum, 0, 1/maxnum, color='red')
-    plt.show()
+    # rng_arr = randint(minval, maxval, size)
+    # edges = np.linspace(minval, maxval, int(maxval - minval + 1))
+    # # print(np.min(rng_arr), np.max(rng_arr))
+    # plt.figure()
+    # plt.hist(rng_arr, bins=edges, density=True)
+    # # plt.vlines(maxnum, 0, 1/maxnum, color='red')
+    # plt.show()
 
