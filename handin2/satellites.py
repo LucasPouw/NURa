@@ -1,5 +1,3 @@
-#%%
-
 #!/usr/bin/env python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,7 +22,6 @@ N_GENERATE = 10000
 
 def numdens(x, norm, Nsat=NSAT, a=A, b=B, c=C):
     return norm * Nsat * ((x / b) ** (a - 3)) * np.exp(-((x / b) ** c))
-    
 
 
 # Q1a
@@ -34,25 +31,6 @@ normalization = 1/integral[0]
 print(integral, 'integral of p(x) for norm=1')
 print(normalization, r'required normalization on $x \in$[10^-4, 5]')
 print()
-
-def numdens_derivative(x, norm=normalization, Nsat=NSAT, a=A, b=B, c=C):
-    return (
-        (
-            norm 
-            * Nsat 
-            * b ** 3 
-            * np.exp(-(x / b) ** c) 
-            * (x / b) ** a
-            * (-3 + a - c * (x / b) ** c)
-        )
-        / x ** 4
-    )
-
-f = lambda x: numdens(x, norm=normalization)
-print( ridder(f, x=1)[0] )
-print( numdens_derivative(x=1) )
-
-#%%
 
 # Q1b
 def p_of_x(x, norm=normalization, a=A, b=B, c=C):
@@ -68,7 +46,7 @@ accepted_samps_1b = rejection_sampling(target_func=p_of_x, xmin=XMIN, xmax=XMAX,
 # 21 edges of 20 bins in log-space
 edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 21)
 hist = np.histogram(accepted_samps_1b, bins=edges)[0]
-hist_scaled = hist / np.diff(edges) / (N_GENERATE / NSAT ) / NSAT
+hist_scaled = hist / np.diff(edges) / N_GENERATE
 
 fig1b, ax = plt.subplots()
 ax.stairs(hist_scaled, edges=edges, fill=True, label="Satellite galaxies")
@@ -150,7 +128,7 @@ plt.plot(xx, inverse_cdf(xx), color='grey', label=r'ICDF')
 plt.plot(xx, func2samp(xx), color='red', zorder=6, label=r'$f(x)$')
 plt.plot(xx, p_of_x(xx), color='blue', zorder=5, label=r'$p(x)$')
 
-edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 51)
+# edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 51)
 hist, _ = np.histogram(x_samps, bins=edges, density=True)
 plt.stairs(hist * max_value_cdf, edges=edges, linewidth=2, color='coral', label='Inverse transform sampled')
 plt.hist(accepted_samps_1b_extra, density=True, histtype='step', color='skyblue', linewidth=2, bins=edges, label='Rejection sampled')
@@ -194,9 +172,6 @@ def numdens_derivative(x, norm=normalization, Nsat=NSAT, a=A, b=B, c=C):
         / x ** 4
     )
 
-print( ridder(numdens, x=1) )
+f = lambda x: numdens(x, norm=normalization)
+print( ridder(f, x=1, m=10, target_error=1e-12)[0][0] )
 print( numdens_derivative(x=1) )
-
-
-if __name__ == '__main__':
-    pass
