@@ -8,8 +8,10 @@ The histogram is normalized by dividing by the bin width and by the total number
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/my_solution_1b.png}
-    \caption{xxx
-    } \label{fig:1b}
+    \caption{The radial distribution of galaxies. The analytical distribution (red line) matches the histogram
+    of $10^4$ samples well. There are very few samples below $x \approx 10^{-2}$, because the probability of
+    drawing a sample here with $10^4$ total samples is too low.
+    }
 \end{figure}
 
 
@@ -20,7 +22,7 @@ CDF does not have a closed-from solution (so that would require `scipy.special` 
 
 Therefore, we will find a proposal function that matches $p(x)$ better than the horizontal line. We need
 a function $f(x) > p(x) \, \forall x$ of which we have an analytical CDF that 
-can be inverted. We can then do inverse-CDF sampling on $f(x)$ followed by rejection sampling of $p(x)$.
+can be inverted. We can then do inverse transform sampling on $f(x)$ followed by rejection sampling of $p(x)$.
 
 Looking at the inequality
 \begin{equation}
@@ -92,8 +94,12 @@ and then for $a=2.4$, $b=0.25$ and $c=1.6$ we get
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/q1b_reject_and_inverse_transform.png}
-    \caption{xxx
-    } \label{fig:1b_extra}
+    \caption{Radial galaxy distribution using our improved method. Our proposal distribution (red line) matches our target distribution
+    (blue line) more closely than a simple horizontal line. Samples from the proposal distribution are drawn using inverse transform 
+    sampling, requiring analytical expressions for the CDF (black line) and its inverse (gray line). The samples from the proposal 
+    distribution are shown as a light red histogram. Note that this histogram is not normalized, because the proposal distribution is
+    not normalized. Subsequently, we use rejection sampling to get the light blue histogram. These samples match our target distribution well.
+    }
 \end{figure}
 
 It takes about 4 times less iterations to accept $10^4$ samples.

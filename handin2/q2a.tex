@@ -1,16 +1,15 @@
 \subsection{Q2a}
 
 To find the equilibrium temperature, the false position method suffices.
-
+Equating the heating and cooling, we get
 \begin{align}
     \Gamma_{\rm pe} &= \Lambda_{\rm rr} \\
     \alpha_{\rm B} n_{\rm H} n_{\rm e} \psi k_{\rm B} T_{\rm c} &= \alpha_{\rm B} n_{\rm H} n_{\rm e} \langle E_{\rm rr} \rangle \\
-    \psi T_{\rm c} &= \left[0.0684 - 0.0416 \ln\left( \frac{T_{4}}{Z^2} \right) \right]T
+    \psi T_{\rm c} &= \left[0.0684 - 0.0416 \ln\left( \frac{T_{4}}{Z^2} \right) \right]T \, .
 \end{align}
-
-So the roots satisfy:
+So the roots satisfy
 \begin{equation}
-    T - \psi T_{\rm c} \left[0.0684 - 0.0416 \ln\left( \frac{T}{Z^2 \cdot 10^{4} \rm \, K} \right) \right]^{-1} = 0
+    T - \psi T_{\rm c} \left[0.0684 - 0.0416 \ln\left( \frac{T}{Z^2 \cdot 10^{4} \rm \, K} \right) \right]^{-1} = 0 \, .
 \end{equation}
 
 \noindent The code:

@@ -56,11 +56,8 @@ fi
 echo "Running script for exercise 1a: ..."
 python3 q1a.py > q1a_output.txt
 
-echo "Running script for exercise 1b: ..."
-python3 q1b.py > q1b_output.txt
-
-echo "Running script for exercise 1c: ..."
-python3 q1c.py > q1c_output.txt
+echo "Running script for exercise 1b and 1c: ..."
+python3 q1bc.py > q1bc_output.txt
 
 echo "Running script for exercise 1d: ..."
 python3 q1d.py > q1d_output.txt

@@ -35,5 +35,5 @@ def numdens_derivative(x, norm=normalization, Nsat=NSAT, a=A, b=B, c=C):
 f = lambda x: numdens(x, norm=normalization)
 numerical_result = ridder(f, x=1, m=7, target_error=1e-12)
 analytical_result = numdens_derivative(x=1)
-print(f'Ridder differentiation of n(x) at x=1 gives {numerical_result[0][0]} with an error of {numerical_result[1]}')
-print(f'The analytical result is {analytical_result}')
+print(f'\nRidder differentiation of n(x) at x=1 gives {numerical_result[0][0]} with an error of {numerical_result[1]}')
+print(f'\nThe analytical result is {analytical_result}')

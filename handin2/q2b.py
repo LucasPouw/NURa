@@ -26,12 +26,12 @@ def equilibrium2(T, nH, Z=METALLICITY, Tc=TC, psi=PSI, A=CONST, xi=XI):
     )
 
 
-def derivative_equilibrium2(T, nH, Z=METALLICITY, Tc=TC, psi=PSI, A=CONST, xi=XI):
+def derivative_equilibrium2(T, nH, Z=METALLICITY):
     return (
         (
             -0.684
             + 0.0416 * (np.log(T / (1e4 * Z * Z)) + 1)
-            - 0.57 * 1.37 * (T / 1e4) ** 0.37
+            - 0.54 * 1.37 * (T / 1e4) ** 0.37
         )
         * k
         * nH

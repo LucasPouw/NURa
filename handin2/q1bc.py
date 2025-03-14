@@ -110,9 +110,9 @@ while n_accepted < N_GENERATE:
     n_accepted += len(accept_these)
     
     if not it_counter % 10:
-        print(f'Accepted:{n_accepted}/{N_GENERATE}')
+        print(f'\nAccepted:{n_accepted}/{N_GENERATE}')
 
-print(f'Accepted:{n_accepted}/{N_GENERATE} in {it_counter} iterations.')
+print(f'\nAccepted:{n_accepted}/{N_GENERATE} in {it_counter} iterations.\n')
 
 x_samps = inverse_cdf( uniform(low=0, high=max_value_cdf, size=N_GENERATE ) )
 

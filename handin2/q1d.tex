@@ -1,10 +1,9 @@
 \subsection{Q1d}
 
-The numerical derivative is calculated with Ridder's method. The analytical derivative is
-
+The numerical derivative is calculated with Ridder's method. The analytical derivative is given by
 \begin{equation}
     \frac{\dd n(x)}{\dd x} 
-    = k_{\rm B} \left(-0.684 + 0.0416 \left[\ln\left(\frac{T}{Z^2 \cdot 10^4 \rm \, K}\right)
+    = \langle N_{\rm sat} \rangle b^{3} x^{-4} \exp{-\left( x/b \right)^{c}} \left( x/b \right)^{a} \cdot (-3 + a - c \left( x/b \right)^{c})
 \end{equation}
 
 \noindent The code:

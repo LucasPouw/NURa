@@ -1,10 +1,16 @@
 \subsection{Q1c}
 
+We sample without replacement using a Knuth (or Fisher-Yates) shuffle. This is a method for
+in-place shuffling of an array. If this array is an indexing array, we get random indeces with
+equal probability with which we can randomly choose elements from an array.
+
+Sorting is done with quicksort and then we make the CDF plot.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/my_solution_1c.png}
-    \caption{xxx
-    } \label{fig:1b}
+    \caption{CDF of 100 randomly sampled galaxies from our radial distribution.
+    }
 \end{figure}
 
 \noindent The code is at the end of the Q1b code, because it uses the samples generated there!

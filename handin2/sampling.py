@@ -60,9 +60,9 @@ def rejection_sampling(target_func, xmin, xmax, fmax, size=1, samps_per_it=int(1
         n_accepted += len(accept_these)
         
         if not it_counter % 10:
-            print(f'Accepted:{n_accepted}/{size}')
+            print(f'\nAccepted:{n_accepted}/{size}')
 
-    print(f'Accepted:{n_accepted}/{size} in {it_counter} iterations.')
+    print(f'\nAccepted:{n_accepted}/{size} in {it_counter} iterations.\n')
 
     return accepted_samps
     
