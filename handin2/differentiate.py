@@ -24,25 +24,23 @@ def ridder(func, x, h=0.1, d=float(2), m=5, target_error=1e-10):
         for j in range(m - i):
             trial_df[j,:] = (extrap * trial_df[j+1,:] - trial_df[j,:]) / (extrap - 1)
         
-        trial_error = np.max( np.abs(trial_df[0,:] - df[0,:]) )  # Biggest difference between two subsequent estimates
+        trial_error = np.max( np.abs(trial_df[0,:] - trial_df[1,:]) )
         
         if trial_error > best_error:  # New estimate is worse, return old estimate
             print('Best estimate reached at m =', i + 1)
-            return df[0,:], df[1,:]
+            return df[0,:], best_error
         else:
             df = trial_df
             best_error = trial_error
-            print('Checking lowest error:', best_error)
 
             if best_error < target_error:  # New estimate is accurate enough
                 print('Target error reached at m =', i + 1)
-                return df[0,:], df[1,:]
+                return df[0,:], best_error
     
     print('No stopping condition reached. Finished loop at m =', i + 1)
 
-    return df[0,:], df[1,:]
+    return df[0,:], best_error
 
 
 if __name__ == '__main__':
-
     pass

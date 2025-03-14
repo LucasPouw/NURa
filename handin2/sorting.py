@@ -69,22 +69,8 @@ def quicksort(array: np.ndarray) -> None:
 
     # Sorting sub-arrays
     quicksort(array[:i])
-    quicksort(array[j+1:])  # Don't include pivot
+    quicksort(array[j+1:])  # Don't include pivot, it's already sorted
 
     
 if __name__ == '__main__':
-
-    N = int(1e6)
-    array = np.arange(N)
-    # array[:100] = N//2
-    np.random.shuffle(array)
-    print(array)
-
-    is_sorted = lambda a: np.all(a[:-1] <= a[1:])
-    print('Initial array sorted?', is_sorted(array))
-
-    # selection_sort(array)
-
-    quicksort(array)
-    print(array)
-    print('Final array sorted?', is_sorted(array))
+    pass

@@ -1,0 +1,107 @@
+\subsection{Q1b}
+
+\subsubsection{Regular method}
+
+We use rejection sampling with a horizontal line at the maximum of $p(x)$ (calculation in next subsubsection).
+The histogram is normalized by dividing by the bin width and by the total number of samples in the histogram.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/my_solution_1b.png}
+    \caption{xxx
+    } \label{fig:1b}
+\end{figure}
+
+
+\subsubsection{A more efficient method}
+Regular rejection sampling has a high chance of rejecting samples, because the rejection region between the
+horizontal line and $p(x)$ is big. It would be better to do inverse-transform sampling of $p(x)$, but the
+CDF does not have a closed-from solution (so that would require `scipy.special` stuff).
+
+Therefore, we will find a proposal function that matches $p(x)$ better than the horizontal line. We need
+a function $f(x) > p(x) \, \forall x$ of which we have an analytical CDF that 
+can be inverted. We can then do inverse-CDF sampling on $f(x)$ followed by rejection sampling of $p(x)$.
+
+Looking at the inequality
+\begin{equation}
+    f(x) \geq 4\pi A b^{3-a} x^{a-1} \exp\left\{-\left(\frac{x}{b}\right)^{c} \right\}
+\end{equation}
+we first analyze the behavior of $p(x)$ at high $x$ and low $x$. For $x$ approaching zero:
+\begin{equation}
+    \lim_{x \downarrow 0} \left[ x^{a-1} \exp\left\{-\left(\frac{x}{b}\right)^{c} \right\} \right] = x^{a-1} \, ,
+\end{equation}
+which means that the power law dominates and we get
+\begin{equation}
+    p(x) \leq 4\pi A b^{3-a} x^{a-1} \, .
+\end{equation}
+A first guess for our function is $f(x) = x^{a-1}$, but the rejection sampling will become very inefficient for large $x$, because for $x$ approaching infinity:
+\begin{equation}
+    \lim_{x \to \infty} \left[ x^{a-1} \exp\left\{-\left(\frac{x}{b}\right)^{c} \right\} \right] = 0 \, ,
+\end{equation}
+which means the exponential decay dominates $p(x)$. Therefore, we also need $f(x)$ to decay to 0 for large $x$. We can divide by a function of the form $g(x) = 1+\beta x^\gamma$, where $\gamma > a-1$. Using this prescription, $g(x) \ll 1$ for small $x$, such that $f(x)$ approaches $x^{a-1}$ again. At the same time, $g(x) \gg x^{a-1}$ for large $x$, causing a decay to 0. This decay will not be faster than the exponential decay of $p(x)$, so the whole function will still be larger than $p(x)$. In conclusion, our functional form becomes
+\begin{equation}
+    f(x) = 4\pi A b^{3-a} \frac{x^{a-1}}{1+\beta x^\gamma} \, .
+\end{equation}
+
+We now determine $\beta$ and $\gamma$. A natural choice for $\gamma$ comes up when evaluating the integral of $f(x)$:
+\begin{equation}
+    I(x) = 4\pi A b^{3-a} \int_{0}^{x} \frac{x^{a-1}}{1+\beta x^\gamma} \dd x \,
+\end{equation}
+which has an analytical solution for $\gamma = a$, because substituting $u = 1 + \beta x^a$, $\dd u = \beta a x^{a-1}$ gives 
+\begin{align}
+    I(x) 
+    &= \frac{4\pi A b^{3-a}}{\beta a} \int_{1}^{1+\beta x^a} \frac{1}{u} \dd u \\
+    &= \frac{4\pi A b^{3-a}}{\beta a} \ln \left( 1 + \beta x^a \right) \, .
+\end{align}
+Now that we're here, we can already calculate the inverse that we want to sample:
+\begin{equation}
+    I^{-1}(X) = \left[ \frac{1}{\beta} \left( \exp\left\{ \frac{\beta a}{4\pi A b^{3-a}} X \right\} - 1 \right) \right]^{1/a} \, ,
+\end{equation}
+where $X \sim U(0,1)$.
+
+Almost there. We can choose $\beta$ such that the maxima of $p(x)$ and $f(x)$ coincide, such that $f(x)$ is as close as possible to $p(x)$. We find the location of the maxima by setting the derivative to zero:
+\begin{align}
+    f'(x) = \frac{x^{-2 + a} (-1 + a - \beta x^a)}{(1 + \beta x^a)^2} &= 0 \\
+    x^{-2 + a} (-1 + a - \beta x^a) &= 0 \\
+    -1 + a - \beta x^a &= 0 \\
+    x = \left( \frac{a-1}{\beta} \right)^{1/a} \, ,
+\end{align}
+which gives a maximum of $f(x)$ of 
+\begin{equation}
+    f_{\mathrm{max}} = \frac{4\pi A b^{3-a}}{a} \left( \frac{a-1}{\beta} \right)^{1-1/a} \, .
+\end{equation}
+
+Now for $p(x)$:
+\begin{align}
+    p'(x) = \exp\left\{ -\left(\frac{x}{b}\right)^c\right\} x^{-2 + a} \left(-1 + a - c \left(\frac{x}{b}\right)^c \right) &= 0 \\
+    -1 + a - c \left(\frac{x}{b}\right)^c &= 0 \\
+    x = b\left(\frac{a - 1}{c}\right)^{1/c} \, ,
+\end{align}
+giving a maximum of
+\begin{equation}
+    p_{\mathrm{max}} = 4\pi A b^{2} \left(\frac{a - 1}{c}\right)^{(a-1)/c} \exp\left\{\frac{1-a}{c} \right\} \,
+\end{equation}
+and then for $a=2.4$, $b=0.25$ and $c=1.6$ we get
+\begin{align}
+    f_{\mathrm{max}} &= p_{\mathrm{max}} \\
+    \frac{b^{1-a}}{a} \left( \frac{a-1}{\beta} \right)^{1-1/a} &= \left(\frac{a - 1}{c}\right)^{(a-1)/c} \exp\left\{\frac{1-a}{c} \right\} \\
+    \beta &= (a-1)\left[ \frac{a}{b^{1-a}} \left(\frac{a - 1}{c}\right)^{(a-1)/c} \exp\left\{\frac{1-a}{c} \right\} \right]^{a/(1-a)} \\
+    \beta &\approx 47.6114 \, .
+\end{align}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{plots/q1b_reject_and_inverse_transform.png}
+    \caption{xxx
+    } \label{fig:1b_extra}
+\end{figure}
+
+It takes about 4 times less iterations to accept $10^4$ samples.
+
+\noindent The code:
+
+\lstinputlisting{q1bc.py}
+
+\noindent The output:
+
+\input{q1bc_output.txt}

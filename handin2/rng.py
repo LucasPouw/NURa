@@ -3,7 +3,6 @@ import time
 
 
 TWOTOPOWER32 = np.uint64(1) << np.uint64(32)
-TWOTOPOWER64 = 2**64
 
 
 def current_milli_time():
@@ -66,27 +65,4 @@ def randint(low, high, size=1, **kwargs):
 
 
 if __name__ == '__main__':
-
-    seed = current_milli_time()
-    for i in range(10):
-        print(uniform(seed=seed+i))
-
-    # import matplotlib.pyplot as plt
-
-    # N = 1000
-    # size = 100000
-
-    # # arr = choice(np.arange(N), size=size)
-    # # print(arr, 'result')
-
-    # minval = 0
-    # maxval = 100
-    
-    # rng_arr = randint(minval, maxval, size)
-    # edges = np.linspace(minval, maxval, int(maxval - minval + 1))
-    # # print(np.min(rng_arr), np.max(rng_arr))
-    # plt.figure()
-    # plt.hist(rng_arr, bins=edges, density=True)
-    # # plt.vlines(maxnum, 0, 1/maxnum, color='red')
-    # plt.show()
-
+    pass

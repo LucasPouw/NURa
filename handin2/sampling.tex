@@ -1,0 +1,9 @@
+\subsection{Sampling methods}
+
+We use rejection sampling for Q1b and an equivalent of `np.random.choice` using the Knuth shuffle method for Q1c.
+The rejection sampling is done iteratively. In each iteration, an array of random numbers is generated, which
+allows for vectorized function evaluations. Because the number of generated samples is fixed for each iteration,
+it is possible to overshoot the target number of accepted samples. These extra samples are thrown away.
+
+\noindent The code:
+\lstinputlisting{sampling.py}

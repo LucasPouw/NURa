@@ -44,16 +44,4 @@ def romberg(func, start, stop, order):
 
 
 if __name__ == '__main__':
-
-    func = lambda x: 3 * np.exp(-2 * x) + 0.0001 * x**4
-    true_value = 3.4999999969082696
-
-    for N in [10, 100, 1000, 10000]:
-        trapz = trapezoid(func, 0, 10, 1/N)
-        simp = simpson(func, 0, 10, N)
-        print(f'Trapezoid for N = {N} gives {trapz}. So the error is {abs(true_value - trapz)}.')
-        print(f'Simpson for N = {N} gives {simp}. So the error is {abs(true_value - simp)}.')
-
-    for m in [2, 4, 6]:
-        romb = romberg(func, 0, 10, m)[0]
-        print(f'Romberg for m = {m} gives {romb}. So the error is {abs(true_value - romb)}.')
+    pass

@@ -4,19 +4,17 @@ import matplotlib.pyplot as plt
 import sys, os
 from integrate import romberg
 from rng import uniform, current_milli_time
-from sampling import choice, rejection_sampling
+from sampling import rejection_sampling
 from sorting import quicksort
-from differentiate import ridder
+from sampling import choice
 
 
 NSAT = 100
 A = 2.4
 B = 0.25
 C = 1.6
-
 XMIN, XMAX = 10**-4, 5
 xx = np.linspace(XMIN, XMAX, 10000)  # Range for plotting and integrating
-
 N_GENERATE = 10000
 
 
@@ -24,15 +22,11 @@ def numdens(x, norm, Nsat=NSAT, a=A, b=B, c=C):
     return norm * Nsat * ((x / b) ** (a - 3)) * np.exp(-((x / b) ** c))
 
 
-# Q1a
-func2integrate = lambda x: numdens(x, Nsat=1, norm=1) * x**2 * 4 * np.pi  # Nsat = 1, because it divides out
+func2integrate = lambda x: numdens(x, Nsat=1, norm=1) * x**2 * 4 * np.pi  # Nsat = 1 such that norm = 1/integral
 integral = romberg(func2integrate, XMIN, XMAX, order=14)  # Wolfram: 0.108756
 normalization = 1/integral[0]
-print(integral, 'integral of p(x) for norm=1')
-print(normalization, r'required normalization on $x \in$[10^-4, 5]')
-print()
 
-# Q1b
+# Q1b starts here
 def p_of_x(x, norm=normalization, a=A, b=B, c=C):
     return 4 * np.pi * norm * b**(3 - a) * x**(a - 1) * np.exp(- (x / b)**c)
 
@@ -128,7 +122,6 @@ plt.plot(xx, inverse_cdf(xx), color='grey', label=r'ICDF')
 plt.plot(xx, func2samp(xx), color='red', zorder=6, label=r'$f(x)$')
 plt.plot(xx, p_of_x(xx), color='blue', zorder=5, label=r'$p(x)$')
 
-# edges = 10 ** np.linspace(np.log10(XMIN), np.log10(XMAX), 51)
 hist, _ = np.histogram(x_samps, bins=edges, density=True)
 plt.stairs(hist * max_value_cdf, edges=edges, linewidth=2, color='coral', label='Inverse transform sampled')
 plt.hist(accepted_samps_1b_extra, density=True, histtype='step', color='skyblue', linewidth=2, bins=edges, label='Rejection sampled')
@@ -156,22 +149,3 @@ ax.set(
     ylim=(0, 100),
 )
 plt.savefig(os.path.join(sys.path[0], "plots/my_solution_1c.png"), dpi=600)
-
-
-# 1d
-def numdens_derivative(x, norm=normalization, Nsat=NSAT, a=A, b=B, c=C):
-    return (
-        (
-            norm 
-            * Nsat 
-            * b ** 3 
-            * np.exp(-(x / b) ** c) 
-            * (x / b) ** a
-            * (-3 + a - c * (x / b) ** c)
-        )
-        / x ** 4
-    )
-
-f = lambda x: numdens(x, norm=normalization)
-print( ridder(f, x=1, m=10, target_error=1e-12)[0][0] )
-print( numdens_derivative(x=1) )

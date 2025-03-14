@@ -11,7 +11,6 @@ CONST = 5e-10  # erg
 XI = 1e-15  # s^-1
 
 
-# here no need for nH nor ne as they cancel out
 def equilibrium1(T, Z=METALLICITY, Tc=TC, psi=PSI):
     return psi * Tc * k - (0.684 - 0.0416 * np.log(T / (1e4 * Z * Z))) * T * k
 

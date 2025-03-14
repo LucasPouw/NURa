@@ -1,0 +1,7 @@
+\subsection{Random number generation}
+
+We generate 32-bit pseudo-random numbers by combining a 64-bit XOR-shift generator with a 32-bit Multiply with Carry generator.
+These generators are used to make functions equivalent to `np.random.uniform` and `np.random.randint`.
+
+\noindent The code:
+\lstinputlisting{rng.py}

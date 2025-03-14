@@ -1,0 +1,33 @@
+\subsection{Q2b}
+
+To find the equilibrium temperature, we use the Newton-Raphson method.
+
+The roots satisfy:
+\begin{align}
+    0 & = k_{\rm B} n_{\rm H} \alpha_{\rm B}
+    \left(
+        \psi T_{\rm c} - T\left[0.684 - 0.0416 \ln\left(\frac{T}{Z^2 \cdot 10^4 \rm \, K}\right) \right]
+        - 0.54 \, T \left(\frac{T}{10^{4} \rm \, K}\right)^{0.37}
+    \right) \\
+        & \quad + A \xi 
+        + 8.9\cdot10^{-26} \left(\frac{T}{10^{4} \rm \, K}\right) \\
+        & \equiv f(T)
+\end{align}
+In order to use the Newton-Raphson method, we calculate the derivative of the $f(T)$:
+\begin{equation}
+    f'(T) = k_{\rm B} n_{\rm H} \alpha_{\rm B}
+    \left(
+    -0.684
+    + 0.0416 \left[\ln\left(\frac{T}{Z^2 \cdot 10^4 \rm \, K}\right) + 1\right]
+    - 0.57 \cdot 1.37 \left(\frac{T}{10^{4} \rm \, K}\right)^{0.37}
+    \right)
+    + 8.9 \cdot 10^{-30}
+\end{equation}
+
+\noindent The code:
+
+\lstinputlisting{q2b.py}
+
+\noindent The output:
+
+\input{q2b_output.txt}
