@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 from rootfinding import newton_raphson
+import time
 
 k = 1.38e-16  # erg/K
 aB = 2e-13  # cm^3 / s
@@ -43,11 +44,14 @@ def derivative_equilibrium2(T, nH, Z=METALLICITY):
 if __name__ == '__main__':
 
     for dens in [1e-4, 1, 1e4]:
-        print(r'$n_{\rm H} = $', dens)
+        start = time.time()
+        print(r'Hydrogen number density is $n_{\rm H} = $', dens)
         func = lambda x: equilibrium2(x, nH=dens)
         fprime = lambda x: derivative_equilibrium2(x, nH=dens)
 
         root, (abs_err, rel_err) = newton_raphson(func, fprime, initial_guess=5e14, target_abs=np.inf, target_rel=1e-10, max_it=int(1e5))
-        print(f'Equilibrium temperature is $T$ = {root}')
-        print(f'Absolute error: {abs_err:.6e}')
-        print(f'Relative error: {rel_err:.6e}\n')
+        t = time.time() - start
+        print(f'\nEquilibrium temperature is $T$ = {root}\n')
+        print(f'\nAbsolute error: {abs_err:.6e}\n')
+        print(f'\nRelative error: {rel_err:.6e}\n')
+        print(f'\nThat took {t} s\n')

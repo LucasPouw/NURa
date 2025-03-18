@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 from rootfinding import false_position
+import time
 
 k = 1.38e-16  # erg/K
 PSI = 0.929
@@ -13,7 +14,10 @@ def equilibrium1(T, Z=METALLICITY, Tc=TC, psi=PSI):
 
 
 if __name__ == '__main__':
+    start = time.time()
     root, (abs_err, rel_err) = false_position(equilibrium1, bracket=[1, 1e7])
-    print(f'Equilibrium temperature is $T$ = {root}')
-    print(f'Absolute error: {abs_err:.6e}')
-    print(f'Relative error: {rel_err:.6e}\n')
+    t = time.time() - start
+    print(f'\nEquilibrium temperature is $T$ = {root}\n')
+    print(f'\nAbsolute error: {abs_err:.6e}\n')
+    print(f'\nRelative error: {rel_err:.6e}\n')
+    print(f'\nThat took {t} s\n')
