@@ -1,6 +1,13 @@
 #!/bin/bash
 
-echo "Downloading data..."
+echo "Clearing/creating the plotting directory"
+if [ ! -d "plots" ]; then
+  mkdir plots
+fi
+rm -rf plots/*
+
+
+echo "Checking/downloading data..."
 if [ ! -e satgals_m11.txt ]; then
   wget https://home.strw.leidenuniv.nl/~daalen/Handin_files/satgals_m11.txt
 fi
