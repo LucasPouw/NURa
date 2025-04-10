@@ -43,5 +43,9 @@ def romberg(func, start, stop, order):
     return r[0], abs(r[0] - r[1])  # Solution, error
 
 
+def romberg_midpoint(func, start, stop, order):
+    NotImplemented
+
+
 if __name__ == '__main__':
     pass

@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm
 
 
 def selection_sort(array: np.ndarray) -> None:
@@ -10,7 +9,7 @@ def selection_sort(array: np.ndarray) -> None:
         return None
 
     N = len(array)
-    for i in tqdm(range(N-1)):
+    for i in range(N-1):
         imin = i
         for j in range(i+1, N):
             if array[j] < array[imin]:

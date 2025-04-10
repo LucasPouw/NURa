@@ -110,10 +110,6 @@ def golden_section(func, a, b, target_accuracy=1e-10, w_bracket=GOLDEN_RATIO, ma
         return d
     else:
         return b
-    
-
-def brent(func, bracket, target_accuracy=1e-10, max_it=int(1e5)):
-    return
 
 
 def downhill_simplex(func, simplex, it=0, target_fractional_accuracy=1e-10, max_it=int(1e3)):
@@ -131,6 +127,7 @@ def downhill_simplex(func, simplex, it=0, target_fractional_accuracy=1e-10, max_
     while it < max_it:
         # Sort x-values based on y-values
         y_vals = func(simplex)
+        print(y_vals, 'FIRST')
         mapping = {y_val: index for index, y_val in enumerate(y_vals)}  # Link y-vals to their idx
         quicksort(y_vals)  # In-place sorted
         indexing_array = [mapping[key] for key in y_vals]  # Get new idx order
@@ -149,6 +146,7 @@ def downhill_simplex(func, simplex, it=0, target_fractional_accuracy=1e-10, max_
         # Propose new point by reflecting x_N
         x_try = np.array([2 * centroid - simplex[-1, :]])
         y_try = func(x_try)
+        print(y_try, 'SECOND')
 
         if y_vals[0] <= y_try < y_vals[-1]:  # New point is better, but not the best
             simplex[-1,:] = x_try  # Accept it
@@ -156,6 +154,7 @@ def downhill_simplex(func, simplex, it=0, target_fractional_accuracy=1e-10, max_
         elif y_try < y_vals[0]:  # New point is the best
             x_exp = 2 * x_try - centroid  # Propose expanded point
             y_exp = func(x_exp)
+            print(y_exp, 'THIRD')
             if y_exp < y_try:  # Even better point found
                 simplex[-1,:] = x_exp
             else:  # Expanded point is not better
@@ -164,6 +163,7 @@ def downhill_simplex(func, simplex, it=0, target_fractional_accuracy=1e-10, max_
         else:  # Now it must be that f(x_try) >= f(x_N), so propose new point
             x_try = np.array([0.5 * (centroid + simplex[-1,:])])
             y_try = func(x_try)
+            print(y_try, 'FOURTH')
 
             if y_try < y_vals[-1]:
                 simplex[-1,:] = x_try  # Accept it

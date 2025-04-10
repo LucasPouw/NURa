@@ -12,9 +12,7 @@ C = 1.6
 XMIN = 1e-4
 XMAX = 5
 
-
-def prefactor(norm=NORM, nsat=NSAT):
-    return 4 * np.pi * norm * nsat
+prefactor = 4 * np.pi * NORM * NSAT
 
 
 def N_of_x_without_prefactor(x, a=C, b=C, c=C):
@@ -22,13 +20,13 @@ def N_of_x_without_prefactor(x, a=C, b=C, c=C):
 
 
 func2minimize = lambda x: -N_of_x_without_prefactor(x)
-minimum = golden_section(func2minimize, a=XMIN, b=XMAX)
-print(minimum, prefactor() * N_of_x_without_prefactor(minimum))
+extremum_x = golden_section(func2minimize, a=XMIN, b=XMAX)
+func_at_maximum = prefactor * N_of_x_without_prefactor(extremum_x)
+print(extremum_x, func_at_maximum)
 
 
 plt.figure()
 xx = np.linspace(XMIN, XMAX, 1000)
-plt.plot(xx, prefactor() * N_of_x_without_prefactor(xx))
-plt.scatter(minimum, prefactor() * N_of_x_without_prefactor(minimum), color='red', marker='o')
+plt.plot(xx, prefactor * N_of_x_without_prefactor(xx))
+plt.scatter(extremum_x, func_at_maximum, color='red', marker='o')
 plt.savefig(os.path.join(sys.path[0], 'plots/numgals.png'), bbox_inches='tight', dpi=600)
-plt.show()
