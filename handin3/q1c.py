@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from integrate import romberg
 from minimize import downhill_simplex
 from utils import readfile
-from sorting import quicksort
 import os, sys
 import time
 
@@ -23,12 +22,19 @@ def normalization(a, b, c, xmin=XMIN_INTEGRAL, xmax=XMAX):
 
 
 def num_gal_pdf(x, a, b, c):
-    a, b, c = np.atleast_1d(a), np.atleast_1d(b), np.atleast_1d(c)
+    x, a, b, c = np.atleast_1d(x), np.atleast_1d(a), np.atleast_1d(b), np.atleast_1d(c)
     N = len(a)
     A = np.zeros(N)
     for i in range(N):
         A[i] = normalization(a[i], b[i], c[i])
     return A * func2norm(x[:, np.newaxis], a, b, c)
+
+
+def ntilde(func, edges, order):
+    binned_model_values = np.zeros(len(edges)-1)
+    for i in range(len(edges)-1):  # Loop over all bins
+        binned_model_values[i] = romberg(func, edges[i], edges[i+1], order=order)[0]
+    return  binned_model_values
 
 
 def poisson_log_llh(data, param_vec, model=num_gal_pdf):
@@ -38,35 +44,46 @@ def poisson_log_llh(data, param_vec, model=num_gal_pdf):
     return -np.sum(llh, axis=0)  # Maximize L = minimize -L
 
 
-fig1c, ax = plt.subplots(3,2,figsize=(6.4,8.0))
 filenames = ['satgals_m11.txt', 'satgals_m12.txt', 'satgals_m13.txt', 'satgals_m14.txt', 'satgals_m15.txt']
-for i, filename in enumerate(filenames):
-    radius, _ = readfile(filename)
+ymin = [1e-8, 1e-7, 1e-5, 1e-3, 1e-1]  # For plotting
+ymax = [1e-2, 1e-1, 1e0, 1e1, 1e2]
 
-    init_simplex = np.array([[1.5, 2.5, 0.2],
-                            [1, 0.5, 1.8],
-                            [1.8, 1.6, 1],
-                            [1.1, 2.3, 5.5]])
+fig1c, ax = plt.subplots(3,2,figsize=(6.4,8.0))
+for i, filename in enumerate(filenames):
+    radius, nhalo = readfile(filename)
+
+    init_simplex = np.array([[1.8, 1.9, 2.6], 
+                            [2., 0.7, 3.2], 
+                            [2.5, 0.8, 2.4], 
+                            [1.9, 1.6, 3.8]])
     
     llh = lambda p: poisson_log_llh(data=radius, param_vec=p, model=num_gal_pdf)
     
     start = time.time()
-    minimum = downhill_simplex(llh, init_simplex)
-    print(minimum, f'that took {time.time() - start} s')
+    minimum, best_log_llh = downhill_simplex(llh, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
+    stop = time.time() - start
+    print(f'----- -lnL RESULTS FOR FILE {filename} -----')
+    print('\nBest-fit parameters are:\n')
+    print(f'a = {minimum[0]}, \nb = {minimum[1]}, \nc = {minimum[2]}')
+    print('\nMinimum -lnL is:\n')
+    print(f'-lnL = {best_log_llh[0] + 1}')
+    print(f'\nThis took {stop:.2f} s\n')
 
     nbins = 100
     logbins = np.linspace(np.log10(XMIN_PLOT), np.log10(XMAX), nbins + 1)
     edges = 10**(logbins)
     centers = 10**(logbins[:-1] + np.diff(logbins) * 0.5)
-    hist = np.histogram(radius, bins=edges)[0]
-    hist_scaled = hist / np.diff(edges) / len(radius)
+    binned_data = np.histogram(radius, bins=edges)[0] / nhalo
+
+    func = lambda x: num_gal_pdf(x, *minimum) * len(radius) / nhalo
+    binned_model_values = ntilde(func, edges, order=6)
 
     row = i // 2
     col = i % 2
-    ax[row,col].step(edges[:-1], hist_scaled, where='post', label='binned data', linewidth=2)
-    ax[row,col].step(edges[:-1], num_gal_pdf(centers, *minimum), where='post', label='Best-fit profile', color='red', linewidth=1)
+    ax[row,col].step(edges[:-1], binned_data, where='post', label='binned data', linewidth=2)
+    ax[row,col].step(edges[:-1], binned_model_values, where='post', label='Best-fit profile', color='red', linewidth=1)
     ax[row,col].set(yscale='log', xscale='log', xlabel='x', ylabel='N', title=f"$M_h \\approx 10^{{{11+i}}} M_{{\\odot}}/h$")
-    ax[row,col].set_ylim(1e-4, 5)
+    ax[row,col].set_ylim(ymin[i], ymax[i])
 ax[2,1].set_visible(False)
 plt.tight_layout()
 handles, labels = ax[2,0].get_legend_handles_labels()

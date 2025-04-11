@@ -23,16 +23,11 @@ def romberg(func, start, stop, order):
     r = np.zeros(order)
     r[0] = 0.5 * h * (func(start) + func(stop))
 
-    Np = 1
     for i in range(1, order):
         Delta = h
         h *= 0.5
-
-        x = np.arange(start + h, Np * Delta, Delta)
-        r[i] += np.sum(func(x))
-
-        r[i] = 0.5 * (r[i-1] + Delta * r[i])
-        Np *= 2
+        x = np.arange(start + h, stop, Delta)
+        r[i] = 0.5 * (r[i-1] + Delta * np.sum(func(x)))
 
     Np = 1
     for i in range(1, order):
@@ -41,10 +36,6 @@ def romberg(func, start, stop, order):
             r[j] = (Np * r[j+1] - r[j]) / (Np - 1)
 
     return r[0], abs(r[0] - r[1])  # Solution, error
-
-
-def romberg_midpoint(func, start, stop, order):
-    NotImplemented
 
 
 if __name__ == '__main__':
