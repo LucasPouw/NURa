@@ -88,24 +88,24 @@ for i, filename in enumerate(filenames):
     chi2 = lambda p: chi_squared(edges, binned_data, param_vec=p, model=num_gal_pdf, nsat=Nsat)
     
     start = time.time()
-    minimum, best_chi2 = downhill_simplex(chi2, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
+    minimum, best_chi2 = downhill_simplex(chi2, init_simplex, target_fractional_accuracy=1e-0, init_volume_thresh=0.1)
     stop = time.time() - start
     
     func = lambda x: num_gal_pdf(x, *minimum, nsat=Nsat)
     binned_model_values = ntilde(func, edges, order=6)
 
-    print(f'\n----- CHI^2 RESULTS FOR FILE {filename} -----\n')
+    print(f'\n----- $\\chi^2$ RESULTS FOR FILE $\\rm {filename}$ -----\n')
     print(f'Mean number of satellites per halo: {Nsat}')
     print('\nBest-fit parameters are:\n')
-    print(f'a = {minimum[0]}, \nb = {minimum[1]}, \nc = {minimum[2]}')
+    print(f'$a$ = {minimum[0]}, \n$b$ = {minimum[1]}, \n$c$ = {minimum[2]}')
     print('\nMinimum chi-squared is:\n')
-    print(f'chi^2 = {best_chi2[0] * nhalo}, \nchi^2 / k = {best_chi2[0] * nhalo / dof}')
+    print(f'$\\chi^2$ = {best_chi2[0] * nhalo}, \n$\\chi^2 / k$ = {best_chi2[0] * nhalo / dof}')
     print('\nG-test results using the untouched model: \n')
     g, p = Gtest(binned_data * nhalo, binned_model_values * nhalo, dof=nbins-4)
-    print(f'G = {g}, p-value = {p}')
+    print(f'$G$ = {g}, p-value = {p}')
     print('\nG-test results using the renormalized model: \n')
     g2, p2 = Gtest(binned_data * nhalo, binned_model_values / np.sum(binned_model_values) * np.sum(binned_data) * nhalo, dof=nbins-4)
-    print(f'G = {g2}, p-value = {p2}')
+    print(f'$G$ = {g2}, p-value = {p2}')
     print(f'\nOptimization took {stop:.2f} s\n')
 
     row = i // 2

@@ -145,9 +145,9 @@ def downhill_simplex(func, simplex, target_fractional_accuracy=1e-10, max_it=int
         fractional_accuracy = 2 * abs(y_vals[-1] - y_vals[0]) / abs(y_vals[-1] + y_vals[0])
 
         if not it % 20:
-            print(f'Downhill simplex iteration {it}')
-            print(f'Current optimal parameters: {simplex[0,:]}')
-            print(f'Current minimum: {y_vals[0]}')
+            print(f'Downhill simplex iteration {it}\n')
+            print(f'Current optimal parameters: {simplex[0,:]}\n')
+            print(f'Current minimum: {y_vals[0]}\n')
             print(f'Fractional accuracy: {fractional_accuracy}\n')
 
         if fractional_accuracy < target_fractional_accuracy:

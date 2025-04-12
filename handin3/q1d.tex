@@ -1,0 +1,8 @@
+\subsection{Q1d}
+
+The code and output are already shown in the previous subsections, but I'll discuss them here.
+
+The number of degrees of freedom is given by $n - k$, where n is the number of bins and $k = 4$ is the number of constraints, which is given by the
+number of free parameters (3) and the normalization of the histogram (1).
+
+% chi2 uses the model mean as variance, which is very small in the outer empty bins. This therefore puts too much weight here and biases the model upwards.

@@ -78,7 +78,7 @@ for i, filename in enumerate(filenames):
     llh = lambda p: poisson_log_llh(data=radius, param_vec=p, model=num_gal_pdf)
     
     start = time.time()
-    minimum, best_log_llh = downhill_simplex(llh, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
+    minimum, best_log_llh = downhill_simplex(llh, init_simplex, target_fractional_accuracy=1e-0, init_volume_thresh=0.1)
     stop = time.time() - start
 
     nbins = 100
@@ -89,24 +89,24 @@ for i, filename in enumerate(filenames):
     func = lambda x: num_gal_pdf(x, *minimum) * len(radius) / nhalo
     binned_model_values = ntilde(func, edges, order=6)
 
-    print(f'\n----- -lnL RESULTS FOR FILE {filename} -----\n')
+    print(f'\n----- $-\\ln \\mathcal{{L}}$ RESULTS FOR FILE $\\rm {filename}$ -----\n')
     print('Best-fit parameters are:\n')
     print(f'a = {minimum[0]}, \nb = {minimum[1]}, \nc = {minimum[2]}')
-    print('\nMinimum -lnL on normalized model is:\n')
-    print(f'-lnL = {best_log_llh[0] + 1}')
-    print('\nMinimum -lnL value on binned, unscaled model is: \n')
-    print(f'-lnL = {unnormalized_poisson_log_llh(binned_data * nhalo, binned_model_values * nhalo)}')
+    print('\nMinimum $-\\ln \\mathcal{{L}}$ on normalized model is:\n')
+    print(f'$-\\ln \\mathcal{{L}}$ = {best_log_llh[0] + 1}')
+    print('\nMinimum $-\\ln \\mathcal{{L}}$ value on binned, unscaled model is: \n')
+    print(f'$-\\ln \\mathcal{{L}}$ = {unnormalized_poisson_log_llh(binned_data * nhalo, binned_model_values * nhalo)}')
     print('\nG-test results using the untouched model: \n')
     g, p = Gtest(binned_data * nhalo, binned_model_values * nhalo, dof=nbins-4)
-    print(f'G = {g}, p-value = {p}')
+    print(f'$G$ = {g}, p-value = {p}')
     print('\nG-test results using the renormalized model: \n')
     g2, p2 = Gtest(binned_data * nhalo, binned_model_values / np.sum(binned_model_values) * np.sum(binned_data) * nhalo, dof=nbins-4)
-    print(f'G = {g2}, p-value = {p2}')
+    print(f'$G$ = {g2}, p-value = {p2}')
     print(f'\nOptimization took {stop:.2f} s\n')
 
     row = i // 2
     col = i % 2
-    ax[row,col].step(edges[:-1], binned_data, where='post', label='binned data', linewidth=2)
+    ax[row,col].step(edges[:-1], binned_data, where='post', label='binned data', color='black', linewidth=2)
     ax[row,col].step(edges[:-1], binned_model_values, where='post', label='Best-fit profile', color='red', linewidth=1)
     ax[row,col].set(yscale='log', xscale='log', xlabel='x', ylabel='N', title=f"$M_h \\approx 10^{{{11+i}}} M_{{\\odot}}/h$")
     ax[row,col].set_ylim(ymin[i], ymax[i])

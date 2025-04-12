@@ -1,3 +1,19 @@
-We find the maximum by minimizing $-N(x)$. It is a 1D function with only a single global minimum, so the golden section method will suffice.
+\subsection{Q1a}
 
-The prefactor is not needed, which saves some operations during the minimization routine.
+We find the maximum of $N(x)$ by minimizing $-N(x)$. Since this is a well-behaved, 1D function 
+with only a single global minimum, the golden section method suffices. Starting from the initial
+two-point bracket, $x \in [0, 5]$, we construct a three-point bracket using the algorithm from 
+the lectures (i.e., propose the abscissa of a parabola and accept it if it is within a threshold,
+otherwise, shift the points and try again.)
+
+The prefactor is not needed in this computation, because the maximum will be located at the same
+point regardless. This saves some operations during the minimization routine. We output the location
+of the maximum and its value (now with the prefactor).
+
+\noindent The output:
+
+\input{q1a_output.txt}
+
+\noindent The code:
+
+\lstinputlisting{q1a.py}
