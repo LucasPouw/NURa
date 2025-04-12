@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from integrate import romberg
+from integrate import midpoint_romberg as romberg
 from minimize import downhill_simplex
 from utils import readfile
 import os, sys
 import time
+from utils import log_factorial
+from scipy.special import gammainc
 
 
 XMIN_PLOT = 1e-4
@@ -44,6 +46,22 @@ def poisson_log_llh(data, param_vec, model=num_gal_pdf):
     return -np.sum(llh, axis=0)  # Maximize L = minimize -L
 
 
+def unnormalized_poisson_log_llh(bin_heights, binned_model):
+    return np.sum(-bin_heights * np.log(binned_model) + binned_model + log_factorial(bin_heights))
+
+
+def chi2_cdf(x, k):
+    "Returns P(chi^2 <= x) for k DoF"
+    return gammainc(0.5 * k, 0.5 * x)
+
+
+def Gtest(observed, expected, dof):
+    remove_zeros = (observed != 0)  # Empty bins have G = 0
+    G = 2 * np.sum( observed[remove_zeros] * (np.log(observed[remove_zeros]) - np.log(expected[remove_zeros])) )
+    p_value = 1 - chi2_cdf(G, dof)
+    return G, p_value
+
+
 filenames = ['satgals_m11.txt', 'satgals_m12.txt', 'satgals_m13.txt', 'satgals_m14.txt', 'satgals_m15.txt']
 ymin = [1e-8, 1e-7, 1e-5, 1e-3, 1e-1]  # For plotting
 ymax = [1e-2, 1e-1, 1e0, 1e1, 1e2]
@@ -62,21 +80,29 @@ for i, filename in enumerate(filenames):
     start = time.time()
     minimum, best_log_llh = downhill_simplex(llh, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
     stop = time.time() - start
-    print(f'----- -lnL RESULTS FOR FILE {filename} -----')
-    print('\nBest-fit parameters are:\n')
-    print(f'a = {minimum[0]}, \nb = {minimum[1]}, \nc = {minimum[2]}')
-    print('\nMinimum -lnL is:\n')
-    print(f'-lnL = {best_log_llh[0] + 1}')
-    print(f'\nThis took {stop:.2f} s\n')
 
     nbins = 100
     logbins = np.linspace(np.log10(XMIN_PLOT), np.log10(XMAX), nbins + 1)
     edges = 10**(logbins)
     centers = 10**(logbins[:-1] + np.diff(logbins) * 0.5)
     binned_data = np.histogram(radius, bins=edges)[0] / nhalo
-
     func = lambda x: num_gal_pdf(x, *minimum) * len(radius) / nhalo
     binned_model_values = ntilde(func, edges, order=6)
+
+    print(f'\n----- -lnL RESULTS FOR FILE {filename} -----\n')
+    print('Best-fit parameters are:\n')
+    print(f'a = {minimum[0]}, \nb = {minimum[1]}, \nc = {minimum[2]}')
+    print('\nMinimum -lnL on normalized model is:\n')
+    print(f'-lnL = {best_log_llh[0] + 1}')
+    print('\nMinimum -lnL value on binned, unscaled model is: \n')
+    print(f'-lnL = {unnormalized_poisson_log_llh(binned_data * nhalo, binned_model_values * nhalo)}')
+    print('\nG-test results using the untouched model: \n')
+    g, p = Gtest(binned_data * nhalo, binned_model_values * nhalo, dof=nbins-4)
+    print(f'G = {g}, p-value = {p}')
+    print('\nG-test results using the renormalized model: \n')
+    g2, p2 = Gtest(binned_data * nhalo, binned_model_values / np.sum(binned_model_values) * np.sum(binned_data) * nhalo, dof=nbins-4)
+    print(f'G = {g2}, p-value = {p2}')
+    print(f'\nOptimization took {stop:.2f} s\n')
 
     row = i // 2
     col = i % 2

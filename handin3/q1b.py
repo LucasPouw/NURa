@@ -1,10 +1,11 @@
 import numpy as np
 from utils import readfile
-from integrate import romberg
+from integrate import midpoint_romberg as romberg
 from minimize import downhill_simplex
 import matplotlib.pyplot as plt
 import os, sys
 import time
+from scipy.special import gammainc
 
 
 XMIN_PLOT = 1e-4
@@ -51,15 +52,21 @@ def chi_squared(edges, bin_heights, param_vec, model, **model_kwargs):
     return chi2_arr
 
 
+def chi2_cdf(x, k):
+    "Returns P(chi^2 <= x) for k DoF"
+    return gammainc(0.5 * k, 0.5 * x)
+
+
+def Gtest(observed, expected, dof):
+    remove_zeros = (observed != 0)  # Empty bins have G = 0
+    G = 2 * np.sum( observed[remove_zeros] * (np.log(observed[remove_zeros]) - np.log(expected[remove_zeros])) )
+    p_value = 1 - chi2_cdf(G, dof)
+    return G, p_value
+
+
 filenames = ['satgals_m11.txt', 'satgals_m12.txt', 'satgals_m13.txt', 'satgals_m14.txt', 'satgals_m15.txt']
 ymin = [1e-8, 1e-7, 1e-5, 1e-3, 1e-1]  # For plotting
 ymax = [1e-2, 1e-1, 1e0, 1e1, 1e2]
-
-# minima = np.array([[1.30767685, 1.11882273, 3.15335137],
-#                    [1.5918548, 0.91906036, 3.47614821],
-#                    [1.48406971, 0.80283839, 2.87626552],
-#                    [1.94381939, 0.60776245, 2.50984679],
-#                    [1.99410978, 0.70836665, 2.04264211]])
 
 fig1b, ax = plt.subplots(3, 2, figsize=(6.4, 8.0))
 for i, filename in enumerate(filenames):
@@ -83,24 +90,28 @@ for i, filename in enumerate(filenames):
     start = time.time()
     minimum, best_chi2 = downhill_simplex(chi2, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
     stop = time.time() - start
-    print(f'----- CHI^2 RESULTS FOR FILE {filename} -----')
+    
+    func = lambda x: num_gal_pdf(x, *minimum, nsat=Nsat)
+    binned_model_values = ntilde(func, edges, order=6)
+
+    print(f'\n----- CHI^2 RESULTS FOR FILE {filename} -----\n')
     print(f'Mean number of satellites per halo: {Nsat}')
     print('\nBest-fit parameters are:\n')
     print(f'a = {minimum[0]}, \nb = {minimum[1]}, \nc = {minimum[2]}')
     print('\nMinimum chi-squared is:\n')
     print(f'chi^2 = {best_chi2[0] * nhalo}, \nchi^2 / k = {best_chi2[0] * nhalo / dof}')
-    print(f'\nThis took {stop:.2f} s\n')
-
-    func = lambda x: num_gal_pdf(x, *minimum, nsat=Nsat)
-    binned_model_values = ntilde(func, edges, order=6)
-    # func_llh = lambda x:num_gal_pdf(x, *minima[i], nsat=Nsat)
-    # llh_model_values = ntilde(func_llh, edges, order=6)
+    print('\nG-test results using the untouched model: \n')
+    g, p = Gtest(binned_data * nhalo, binned_model_values * nhalo, dof=nbins-4)
+    print(f'G = {g}, p-value = {p}')
+    print('\nG-test results using the renormalized model: \n')
+    g2, p2 = Gtest(binned_data * nhalo, binned_model_values / np.sum(binned_model_values) * np.sum(binned_data) * nhalo, dof=nbins-4)
+    print(f'G = {g2}, p-value = {p2}')
+    print(f'\nOptimization took {stop:.2f} s\n')
 
     row = i // 2
     col = i % 2
     ax[row,col].step(edges[:-1], binned_data, where='post', color='black', label='binned data')
     ax[row,col].step(edges[:-1], binned_model_values, where='post', label=r'Best-fit $\chi^{2}$', color='red', linewidth=1)
-    # ax[row,col].step(edges[:-1], llh_model_values, where='post', label=r'Best-fit $\ln \mathcal{L}$', color='blue', linewidth=1)
     ax[row,col].set(yscale='log', xscale='log', xlabel='x', ylabel='N', title=f"$M_h \\approx 10^{{{11+i}}} M_{{\\odot}}/h$")
     ax[row,col].set_ylim(ymin[i], ymax[i])
 ax[2,1].set_visible(False)
