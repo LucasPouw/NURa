@@ -88,7 +88,7 @@ for i, filename in enumerate(filenames):
     chi2 = lambda p: chi_squared(edges, binned_data, param_vec=p, model=num_gal_pdf, nsat=Nsat)
     
     start = time.time()
-    minimum, best_chi2 = downhill_simplex(chi2, init_simplex, target_fractional_accuracy=1e-0, init_volume_thresh=0.1)
+    minimum, best_chi2 = downhill_simplex(chi2, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
     stop = time.time() - start
     
     func = lambda x: num_gal_pdf(x, *minimum, nsat=Nsat)

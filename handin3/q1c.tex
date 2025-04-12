@@ -1,11 +1,42 @@
-Note that $\langle N_{\rm sat} \rangle$ is never explicitly required without bins, so it is omitted in the code. 
-That's also why we don't plot the bin heights.
+\subsection{Q1c}
+
+\subsubsection{The Poisson likelihood}
+The likelihood of our model is given by the product of Poisson distributions:
+\begin{equation}
+    \mathcal{L}(x | \vec{p}) = \prod_{i = 0}^{N_{\rm bins} - 1} \frac{\mu(x_{i}|\vec{p})^{y_{i}}\exp\left[-\mu(x_{i}|\vec{p})\right]}{y_{i}!} \, .
+\end{equation}
+The negative log-likelihood is then given by
+\begin{equation}
+    -\ln \mathcal{L}(x|\vec{p}) = -\sum_{i = 0}^{N_{\rm bins} - 1}\left[ y_{i} \ln(\mu(x_{i}|\vec{p})) - \mu(x_{i}|\vec{p}) - \ln(y_{i}!) \right] \, .
+\end{equation}
+We can take the limit to infinitesimal binwidth, such that there is either one or zero counts in each bin. 
+This allows us to estimate the parameters without binning the data. In that case,
+\begin{equation}
+    -\ln \mathcal{L}(x|\vec{p}) = -\sum_{i = 0}^{N - 1} \ln(\mu(x_{i}|\vec{p})) + \int\mu(x|\vec{p}) \dd x \, ,
+\end{equation}
+where we have used $\ln(y_{i}!) = 0$ since $y_{i}$ is either zero or one.
+
+Even though our target model is not normalized to 1 (instead, it integrates to $\langle N_{\rm sat} \rangle$), we can estimate the parameters for a normalized
+model and then convert back to our target model by multiplying by $\langle N_{\rm sat} \rangle$, for plotting. In that case, we get $\int\mu(x|\vec{p}) \dd x = 1$, which
+is independent of the parameters, so we can ignore it in the likelihood. Now that I write this down, I realize that otherwise we would have had
+$\int\mu(x|\vec{p}) \dd x = \langle N_{\rm sat} \rangle$, which is still independent of the data, so the only time
+save is removing the multiplication by $\langle N_{\rm sat} \rangle$ when calling the model...oh well.
+
+Just like with the $\chi^2$, the scaling of our model with $n_{\rm halo}$ and the neglected terms have changed our minimized function from the actual likelihood
+of the model. In order to calculate the actual minimum log-likelihood value, we bin our model (not scaling with $n_{\rm halo}$) and calculate the full equation:
+\begin{equation}
+    -\ln \mathcal{L}(x|\vec{p}) = -\sum_{i = 0}^{N_{\rm bins} - 1}\left[ y_{i} \ln(\mu(x_{i}|\vec{p})) - \mu(x_{i}|\vec{p}) - \ln(y_{i}!) \right] \, .
+\end{equation}
+
+We provide the minimum negative log-likelihood of both our normalized model and on the binned (unscaled) model (which is the one that was actually asked).
+The results are plotted in the same way as our $\chi^2$ plot, with our binned model.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{plots/q1c.png}
     \caption{Histograms of the mean number of satellites per halo as a function of radial distance. The best fit $-\ln \mathcal{L}$ model is
-    (red solid line) plotted on top of the binned data (black histogram).
+    (red solid line) plotted on top of the binned data (black histogram). Even though the best-fit model is binned, the actual parameter estimation is
+    done without binning.
     }
 \end{figure}
 

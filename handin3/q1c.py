@@ -25,7 +25,7 @@ def normalization(a, b, c, xmin=XMIN_INTEGRAL, xmax=XMAX):
 
 def num_gal_pdf(x, a, b, c):
     x, a, b, c = np.atleast_1d(x), np.atleast_1d(a), np.atleast_1d(b), np.atleast_1d(c)
-    N = len(a)
+    N = len(a)  # For multiple nodes in the simplex
     A = np.zeros(N)
     for i in range(N):
         A[i] = normalization(a[i], b[i], c[i])
@@ -36,7 +36,7 @@ def ntilde(func, edges, order):
     binned_model_values = np.zeros(len(edges)-1)
     for i in range(len(edges)-1):  # Loop over all bins
         binned_model_values[i] = romberg(func, edges[i], edges[i+1], order=order)[0]
-    return  binned_model_values
+    return binned_model_values
 
 
 def poisson_log_llh(data, param_vec, model=num_gal_pdf):
@@ -69,6 +69,7 @@ ymax = [1e-2, 1e-1, 1e0, 1e1, 1e2]
 fig1c, ax = plt.subplots(3,2,figsize=(6.4,8.0))
 for i, filename in enumerate(filenames):
     radius, nhalo = readfile(filename)
+    Nsat = len(radius) / nhalo
 
     init_simplex = np.array([[1.8, 1.9, 2.6], 
                             [2., 0.7, 3.2], 
@@ -78,7 +79,7 @@ for i, filename in enumerate(filenames):
     llh = lambda p: poisson_log_llh(data=radius, param_vec=p, model=num_gal_pdf)
     
     start = time.time()
-    minimum, best_log_llh = downhill_simplex(llh, init_simplex, target_fractional_accuracy=1e-0, init_volume_thresh=0.1)
+    minimum, best_log_llh = downhill_simplex(llh, init_simplex, target_fractional_accuracy=1e-8, init_volume_thresh=0.1)
     stop = time.time() - start
 
     nbins = 100
@@ -86,7 +87,7 @@ for i, filename in enumerate(filenames):
     edges = 10**(logbins)
     centers = 10**(logbins[:-1] + np.diff(logbins) * 0.5)
     binned_data = np.histogram(radius, bins=edges)[0] / nhalo
-    func = lambda x: num_gal_pdf(x, *minimum) * len(radius) / nhalo
+    func = lambda x: num_gal_pdf(x, *minimum) * Nsat
     binned_model_values = ntilde(func, edges, order=6)
 
     print(f'\n----- $-\\ln \\mathcal{{L}}$ RESULTS FOR FILE $\\rm {filename}$ -----\n')

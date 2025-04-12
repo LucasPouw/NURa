@@ -38,12 +38,17 @@ Now, there are a few things to watch when performing this integral. First, the $
 This is solved by incorporating the multiplication by $x^2$ in this term and writing $x^{a - 1}$. However, the Downhill Simplex method may
 still step to regions where $a < 1$. Moreover, $b < 0$ also causes problems. In order to avoid these, we apply two priors in our $\chi^2$ 
 model. We set $\chi^2 = \infty$ whenever $a < 1$ or $b < 0$. Finally, we use a midpoint Romberg integrator to be totally safe around $x = 0$.
-All Romberg integrations have order $m=6$, which keeps computation time low, while providing sufficient accuracy.
+All Romberg integrations have order $m = 6$, which keeps computation time low, while still providing sufficient precision.
 For the Downhill Simplex, we set a target fractional accuracy of $10^{-8}$ and a maximum number of 100 iterations. 
-The attained fractional accuracy is usually higher.
+The attained fractional accuracy is usually better.
 
-To end, the minimum $\chi^2$ value should be scaled by $n_{\rm halo}$ to undo the scaling of our histogram. We provide the minimum $\chi^2$
-and the reduced $\chi^2$ (for the number of DoF, see the answer to Q1d).
+To end, the minimum $\chi^2$ value should be scaled by $n_{\rm halo}$ to undo the scaling of our histogram. Namely, looking at the equation
+for $\chi^2$:
+\begin{equation}
+    \chi^2 = \sum_{i = 0}^{N_{\rm bins} - 1} \frac{\left(y_{i} - \mu(x_{i} | \vec{p}) \right)^{2}}{\mu(x_{i} | \vec{p})}
+\end{equation}
+we see that division of our bins ($y_{i}$) and our model mean ($\mu(x_{i} | \vec{p})$) by $n_{\rm halo}$ gives a value of $\chi^2$ that is 
+a factor $n_{\rm halo}$ too small. We provide the minimum $\chi^2$ and the reduced $\chi^2$ (for the number of DoF, see the answer to Q1d).
 
 \begin{figure}[H]
     \centering

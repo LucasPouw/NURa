@@ -1,8 +1,26 @@
 \subsection{Q1d}
 
 The code and output are already shown in the previous subsections, but I'll discuss them here.
+To assess the goodness-of-fit, we perform a G-test on our binned models. The number of degrees of freedom is given by $k = n - c$, 
+where $n = N_{\rm bins}$ is the number of data points and $c = 4$ is the number of constraints. The number of data points is equal
+to the number of bins and the constraints are given by the free parameters (3) and the normalization of the histogram (1).
 
-The number of degrees of freedom is given by $n - k$, where n is the number of bins and $k = 4$ is the number of constraints, which is given by the
-number of free parameters (3) and the normalization of the histogram (1).
+The G-test statistic is given by
+\begin{equation}
+    G = 2 * \sum_{i = 0}^{N_{\rm bins} - 1} O_{i} \ln\left( \frac{O_{i}}{E_{i}} \right) \, ,
+\end{equation}
+where $O_{i}$ is the number of observed counts in bin $i$ (integers) and $E_{i}$ is the expected number of counts in this bin. 
+In empty bins, we have $G = 0$, so those can be omitted in this calculation. Note that the G-test requires the observed histogram
+and the model to integrate to the same value, i.e., the number of observations. However, my Romberg integration method is not accurate
+enough (even with $m = 10$) to get this normalization to a point where the G-test gives believable results for all datasets. Therefore,
+we provide the G-test results using both the model as is and the model that is renormalized to integrate exactly to the number of data points.
 
-% chi2 uses the model mean as variance, which is very small in the outer empty bins. This therefore puts too much weight here and biases the model upwards.
+The p-values (or significances $Q$) of our models are calculated using $Q = 1 - P(x, k)$, where $P(x, k)$ is the CDF of the chi-squared distribution,
+evaluated at $x = G$ with $k = N_{\rm bins} - 4$ degrees of freedom. The CDF of the chi-squared distribution is given by
+\begin{equation}
+    P(x, k) = \frac{\gamma \left( \frac{k}{2}, {x}{2} \right)}{\Gamma \left( \frac{k}{2} \right)} \,
+\end{equation}
+where $\Gamma$ is the gamma function and $\gamma$ is the lower incomplete gamma function.
+
+Comparing our G-test results using the renormalized models, the p-values of the Poisson models are always higher, indicating that these models are better fits. 
+This is expected, since the data is generated from a Poisson process, so our model should be Poissonian and not Gaussian, as assumed by the chi-squared fit.
