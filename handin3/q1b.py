@@ -42,9 +42,11 @@ def chi_squared(edges, bin_heights, param_vec, model, **model_kwargs):
 
         # Apply priors to a and b
         if model_params[0] < 1:
-            return np.tile(np.inf, param_vec.shape[0])
-        if model_params[1] < 0:
-            return np.tile(np.inf, param_vec.shape[0])
+            chi2_arr[k] = np.inf
+            continue
+        elif model_params[1] < 0:
+            chi2_arr[k] = np.inf
+            continue
         
         func = lambda x: model(x, *model_params, **model_kwargs)  # p(x|a,b,c) to integrate over bins
         binned_model_values = ntilde(func, edges, order=6)

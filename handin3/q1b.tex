@@ -36,7 +36,7 @@ require additional multiplication by $4 \pi$.
 
 Now, there are a few things to watch when performing this integral. First, the $x^{a - 3}$ might give problems when $a < 3$ and $x \ll 1$. 
 This is solved by incorporating the multiplication by $x^2$ in this term and writing $x^{a - 1}$. However, the Downhill Simplex method may
-still step to regions where $a < 1$. Moreover, $b < 0$ also causes problems. In order to avoid these, we apply two priors in our $\chi^2$ 
+still step to regions where $a < 1$. Moreover, $b < 0$ also causes problems. In order to quickly step away from these points, we apply two priors in our $\chi^2$ 
 model. We set $\chi^2 = \infty$ whenever $a < 1$ or $b < 0$. Finally, we use a midpoint Romberg integrator to be totally safe around $x = 0$.
 All Romberg integrations have order $m = 6$, which keeps computation time low, while still providing sufficient precision.
 For the Downhill Simplex, we set a target fractional accuracy of $10^{-8}$ and a maximum number of 100 iterations. 
