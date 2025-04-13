@@ -11,7 +11,7 @@ XMAX = 5
 prefactor = 4 * np.pi * NORM * NSAT
 
 
-def N_of_x_without_prefactor(x, a=C, b=C, c=C):
+def N_of_x_without_prefactor(x, a=A, b=B, c=C):
     '''Unnormalized x^2 n(x)'''
     return  x ** (a - 1) * b ** (3 - a) * np.exp(-((x / b) ** c))
 
